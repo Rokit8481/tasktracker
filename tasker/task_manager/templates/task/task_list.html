@@ -1,0 +1,22 @@
+{% extends "base.html" %} 
+
+{% block title %} Всі нотатки {% endblock title %}
+
+{% block content %}
+<div class="row row-cols-2 justify-content-md-center">
+    {% for task in tasks %}
+    <div class = "col mb-4">
+        <div class = "card h-100">
+            <div class="card-body text-left">
+                <h2><a class="card-title" href="{% url 'task_detail' task.pk %}" style="text-decoration: none;">{{ task.title }}</a></h2>
+                <p class="card-text">{{ task.content }}</p>
+            </div>
+        </div> 
+    </div>
+    {% empty %}
+    <p>Наразі немає жодних завдань</p>
+    {% endfor %}  
+</div>
+<a href="{% url 'task_create' %}" class="btn btn-primary">Створити завдання</a>
+
+{% endblock %}

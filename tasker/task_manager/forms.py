@@ -1,9 +1,9 @@
 from django import forms 
-from .models import Note
+from .models import Dashboard, TodoList, Task
 
-class NoteCreateForm(forms.ModelForm):
+class TaskCreateForm(forms.ModelForm):
     class Meta:
-        model = Note
+        model = Task
         fields = ("title", "content")
         widgets = {
             "title": forms.TextInput(attrs = {
