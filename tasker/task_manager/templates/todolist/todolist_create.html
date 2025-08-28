@@ -1,13 +1,13 @@
 {% extends "base.html" %} 
 
-{% block title %} Створення завдання {% endblock title %}
+{% block title %} Створення список завдань {% endblock title %}
 
 {% block content %}
 
-<a href="{% url 'task_list' dashboard_pk=dashboard.pk todolist_pk=todolist.pk  %}" class="btn btn-secondary mb-3">Назад</a>
+<a href="{% url 'todolist_list' dashboard_pk=dashboard.pk %}" class="btn btn-secondary mb-3">Назад</a>
   <div class="card">
     <div class="card-body">
-      <h5>Створити Завдання: </h5>
+      <h5>Створити список завдань: </h5>
       <form method="post">
         {% csrf_token %}
         {{ form.as_p }}

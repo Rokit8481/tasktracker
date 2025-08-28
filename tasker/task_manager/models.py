@@ -23,7 +23,7 @@ class TodoList(models.Model):
     created_by = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name = "Користувач")
 
     def __str__(self):
-        return f"Список завдань: {self.title} який належить дошці: {self.dashboard}"
+        return f"{self.title}, дошка: {self.dashboard}"
     
     class Meta:
         verbose_name = "Список завдань"
@@ -34,14 +34,14 @@ class Task(models.Model):
     todolist = models.ForeignKey(TodoList, on_delete = models.CASCADE, verbose_name = "Список завдань")
     title = models.CharField(max_length = 200, verbose_name = "Назва") 
     content = models.TextField(verbose_name = "Контент", blank = True)
-    status = models.CharField(max_length = 20, verbose_name = "Статус", choices = [
+    status = models.CharField(max_length = 20, verbose_name = "Статус", default = 'draft', choices = [
     ('draft', 'Чернетка'),
     ('in_progress', 'В процесі'),
     ('completed', 'Завершено'),
     ('archived', 'Архів')
     ])
 
-    priority = models.CharField(max_length = 10, verbose_name = "Приорітет", choices = [
+    priority = models.CharField(max_length = 10, verbose_name = "Приорітет", default = 'low', choices = [
     ('low', 'Низький'),
     ('medium', 'Середній'),
     ('high', 'Високий'),
@@ -54,7 +54,7 @@ class Task(models.Model):
     created_by = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name = "Користувач")
     
     def __str__(self):
-        return f"Завдання: {self.title} яке належить списку: {self.todolist}"
+        return f"{self.title}, список: {self.todolist}"
     
     class Meta:
         verbose_name = "Завдання"
