@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Dashboard, TodoList, Task
 from .forms import DashboardCreateForm, TodoListCreateForm, TaskCreateForm
 from django.urls import reverse_lazy
@@ -8,7 +8,9 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, logout
 from django.http import HttpRequest
 
+
 """"Вхід, регестрація та вихід"""
+
 
 #Логін
 def login_view(request: HttpRequest):
@@ -36,7 +38,9 @@ def register(request: HttpRequest):
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
+
 """СПИСКИ"""
+
 
 #Список Дошок
 class DashboardListView(ListView):
@@ -78,6 +82,7 @@ class TaskListView(ListView):
 
 """"ДЕТАЛЬНА СТОРІНКА"""
 
+
 #Детальна сторінка дошки
 class DashboardDetailView(DetailView):
     model = Dashboard
@@ -118,7 +123,9 @@ class TaskDetailView(DetailView):
         context['dashboard'] = task.todolist.dashboard
         return context
 
+
 """"CТОРІНКА СТВОРЕННЯ"""
+
 
 #Сторінка створення дошки
 class DashboardCreateView(CreateView):
@@ -179,3 +186,35 @@ class TaskCreateView(CreateView):
         context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
         context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
         return context
+
+
+""""СТОРІНКА ВИДАЛЕННЯ"""
+
+
+#Видалення дошки
+class DeleteDashboardView(DeleteView):
+    pass
+
+#Видалення списка завдань
+class DeleteTodoListView(DeleteView):
+    pass
+
+#Видалення завдання
+class DeleteTaskView(DeleteView):
+    pass
+
+
+""""СТОРІНКА РЕДАГУВАННЯ"""
+
+
+#Редагування дошки
+class UpdateDashboardView(UpdateView):
+    pass
+
+#Редагування списка завдань
+class UpdateTodoListView(UpdateView):
+    pass
+
+#Редагування завдання
+class UpdateTaskView(UpdateView):
+    pass

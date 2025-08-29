@@ -1,6 +1,6 @@
 {% extends "base.html" %} 
 
-{% block title %} Всі списки завдань {% endblock title %}
+{% block title %} Списки завдань дошки {{ todolist.dashboard }} {% endblock title %}
 
 {% block content %}
 <div class="row row-cols-2 justify-content-md-center">
@@ -8,6 +8,8 @@
     <div class = "col mb-4">
         <div class = "card h-100">
             <div class="card-body text-left">
+                <h6>{{ todolist.created_at }}</h6>
+                <h6>{{ todolist.created_by }}</h6>
                 <h2><a class="card-title" href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" style="text-decoration: none;">{{ todolist.title }}</a></h2>
                 <p class="card-text">{{ todolist.description }}</p>
             </div>

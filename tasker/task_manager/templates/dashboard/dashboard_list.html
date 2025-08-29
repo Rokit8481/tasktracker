@@ -8,6 +8,8 @@
     <div class = "col mb-4">
         <div class = "card h-100">
             <div class="card-body text-left">
+                <h6>Створено: {{ dashboard.created_at }}</h6>
+                <h6>{{ dashboard.created_by }}</h6>
                 <h2><a class="card-title" href="{% url 'dashboard_detail' dashboard.pk %}" style="text-decoration: none;">{{ dashboard.title }}</a></h2>
                 <p class="card-text">{{ dashboard.description }}</p>
             </div>

@@ -8,7 +8,7 @@ class Dashboard(models.Model):
     created_by = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name = "Користувач")
 
     def __str__(self):
-        return f"Дошка: {self.title}"
+        return self.title
     
     class Meta:
         verbose_name = "Дошка"
@@ -23,7 +23,7 @@ class TodoList(models.Model):
     created_by = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name = "Користувач")
 
     def __str__(self):
-        return f"{self.title}, дошка: {self.dashboard}"
+        return self.title
     
     class Meta:
         verbose_name = "Список завдань"
@@ -54,7 +54,7 @@ class Task(models.Model):
     created_by = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name = "Користувач")
     
     def __str__(self):
-        return f"{self.title}, список: {self.todolist}"
+        return self.title
     
     class Meta:
         verbose_name = "Завдання"
