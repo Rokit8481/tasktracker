@@ -11,8 +11,10 @@
     <a class="navbar-brand" href="{% url 'dashboard_list' %}">Мої Дошки</a>
     <div class="ms-auto">
       {% if user.is_authenticated %}
-        {% if dashboard_pk %}
-          <a href="{% url 'todolist_list' dashboard_pk %}">Мої списки завдань</a> |
+        {% if dashboard and todolist %}
+        <a class="navbar-brand" href="{% url 'task_list' dashboard.pk todolist.pk %}">Мої списки завдань | </a> 
+        {% else %}
+        {{ user.username }} |
         {% endif %}
         <form method="post" action="{% url 'logout' %}" style="display: inline;">
           {% csrf_token %}
@@ -25,9 +27,8 @@
     </div>
   </nav>
 
-  <div class="container mt-4">
     {% block content %}{% endblock %}
-  </div>
+
 
 </body>
 </html>

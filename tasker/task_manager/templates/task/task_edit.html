@@ -1,19 +1,17 @@
 {% extends "base.html" %} 
 
-{% block title %} Створення завдання {% endblock title %}
+{% block title %} Редагування завдання {% endblock title %}
 
 {% block content %}
 <div class="container mt-4">
   <a href="{% url 'task_list' dashboard_pk=dashboard.pk todolist_pk=todolist.pk  %}" class="btn btn-secondary mb-3">Назад</a>
     <div class="card">
       <div class="card-body">
-        <h5>Створити Завдання: {{ task.title }} </h5>
+        <h5>Редагувати Завдання: {{ task.title }} </h5>
         <form method="post">
           {% csrf_token %}
           {{ form.as_p }}
-          <button type="submit" class="btn btn-primary" id="submit-btn">Створити</button>
+          <button type="submit" class="btn btn-primary" id="submit-btn" value="Update">Підтвердити</button>
         </form>
-      </div>
-    </div>
 </div>
 {% endblock %}

@@ -3,23 +3,23 @@
 {% block title %} {{ task.title }} {% endblock title %}
 
 {% block content %}
-
-<div class="row row-cols-2 justify-content-md-center">
-    <div class = "col mb-4">
-        <div class = "card h-100">
-            <div class="card-body text-left">
-                Список {{ task.todolist }}
-                <h6>Створено: {{ task.created_at }}</h6>
-                <h6>Оновлено: {{ task.updated_at }}</h6>
-                <h6>{{ task.created_by }}</h6>
-                <h2><a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">Назва:{{ task.title }}</a></h2>
-                <p class="card-text">Контент:{{ task.content }}</p>
-                <p class="card-text">Статус: {{ task.get_status_display }}</p>
-                <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
-                <p class="card-text">Дедлайн: {{ task.deadline }}</p>
-            </div>
-        </div> 
+<div class="container mt-4">
+    <div class="row row-cols-2 justify-content-md-center">
+        <div class = "col mb-4">
+            <div class = "card h-100">
+                <div class="card-body text-left">
+                    Список {{ task.todolist }}
+                    <h6>Створено: {{ task.created_at }}</h6>
+                    <h6>Оновлено: {{ task.updated_at }}</h6>
+                    <h6>{{ task.created_by }}</h6>
+                    <h2><a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">Назва:{{ task.title }}</a></h2>
+                    <p class="card-text">Контент:{{ task.content }}</p>
+                    <p class="card-text">Статус: {{ task.get_status_display }}</p>
+                    <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
+                    <p class="card-text">Дедлайн: {{ task.deadline }}</p>
+                </div>
+            </div> 
+        </div>
     </div>
 </div>
-
 {% endblock %}

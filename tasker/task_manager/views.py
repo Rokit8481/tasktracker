@@ -18,7 +18,7 @@ def login_view(request: HttpRequest):
     if request.method == 'POST':
         if form.is_valid():
             login(request, form.get_user())
-            return redirect('room_list')
+            return redirect('dashboard_list')
     return render(request, 'registration/login.html', {'form': form})
 
 #Вихід
@@ -48,21 +48,6 @@ class DashboardListView(ListView):
     template_name = 'dashboard/dashboard_list.html'
     context_object_name = 'dashboards'
 
-#Список списків завдань
-class TodoListListView(ListView):
-    model = TodoList
-    template_name = 'todolist/todolist_list.html'
-    context_object_name = 'todolists'
-    
-    def get_queryset(self):
-        dashboard_pk = self.kwargs["dashboard_pk"]
-        return TodoList.objects.filter(dashboard_id = dashboard_pk)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
-        return context
-
 #Список Завдань
 class TaskListView(ListView):
     model = Task
@@ -71,37 +56,18 @@ class TaskListView(ListView):
 
     def get_queryset(self):
         todolist_pk = self.kwargs["todolist_pk"]
-        return Task.objects.filter(todolist_id = todolist_pk)
-    
+        return Task.objects.filter(todolist_id=todolist_pk)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
         context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
+        context["dashboards"] = Dashboard.objects.filter(created_by=self.request.user)
+        context["dashboards"] = TodoList.objects.filter(created_by=self.request.user)  
         return context
 
 
 """"ДЕТАЛЬНА СТОРІНКА"""
-
-
-#Детальна сторінка дошки
-class DashboardDetailView(DetailView):
-    model = Dashboard
-    template_name = 'dashboard/dashboard_detail.html'
-    context_object_name = 'dashboard'
-    pk_url_kwarg = "dashboard_pk"
-    
-#Детальна сторінка списку завдань
-class TodoListDetailView(DetailView):
-    model = TodoList
-    template_name = 'todolist/todolist_detail.html'
-    context_object_name = 'todolist'
-
-    def get_object(self, queryset=None):
-        return get_object_or_404(
-            TodoList,
-            pk=self.kwargs["todolist_pk"],
-            dashboard_id=self.kwargs["dashboard_pk"]
-        )
 
 #Детальна сторінка завдання
 class TaskDetailView(DetailView):
@@ -188,33 +154,95 @@ class TaskCreateView(CreateView):
         return context
 
 
-""""СТОРІНКА ВИДАЛЕННЯ"""
-
-
-#Видалення дошки
-class DeleteDashboardView(DeleteView):
-    pass
-
-#Видалення списка завдань
-class DeleteTodoListView(DeleteView):
-    pass
-
-#Видалення завдання
-class DeleteTaskView(DeleteView):
-    pass
-
-
 """"СТОРІНКА РЕДАГУВАННЯ"""
 
 
 #Редагування дошки
-class UpdateDashboardView(UpdateView):
-    pass
+class DashboardUpdateView(UpdateView):
+    model = Dashboard
+    form_class = DashboardCreateForm
+    template_name = 'dashboard/dashboard_edit.html'
+    success_url = reverse_lazy("dashboard_list")
+    pk_url_kwarg = "dashboard_pk"
+
+    def get_queryset(self):
+        return Dashboard.objects.filter(created_by=self.request.user)
 
 #Редагування списка завдань
-class UpdateTodoListView(UpdateView):
-    pass
+class TodoListUpdateView(UpdateView):
+    model = TodoList
+    form_class = TodoListCreateForm
+    template_name = 'todolist/todolist_edit.html'
+    
+    def get_success_url(self):
+        return reverse_lazy("todolist_list", kwargs = {
+            "dashboard_pk": self.kwargs["dashboard_pk"],
+            })
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
+        return context
+    
+    def get_queryset(self):
+        return TodoList.objects.filter(dashboard__created_by=self.request.user)
 
+    
 #Редагування завдання
-class UpdateTaskView(UpdateView):
-    pass
+class TaskUpdateView(UpdateView):
+    model = Task
+    form_class = TaskCreateForm
+    template_name = 'task/task_edit.html'
+    
+    def get_success_url(self):
+        return reverse_lazy("task_list", kwargs = {
+            "dashboard_pk": self.kwargs["dashboard_pk"],
+            "todolist_pk": self.kwargs["todolist_pk"]
+            })
+     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
+        context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
+        return context
+
+    def get_queryset(self):
+        return Task.objects.filter(todolist__dashboard__created_by=self.request.user)
+    
+
+""""СТОРІНКА ВИДАЛЕННЯ"""
+
+
+#Видалення дошки
+class DashboardDeleteView(DeleteView):
+    model = Dashboard
+    success_url = reverse_lazy("dashboard_list")
+    pk_url_kwarg = "dashboard_pk"
+
+    def get_queryset(self):
+        return Dashboard.objects.filter(created_by=self.request.user)
+
+#Видалення списка завдань
+class TodoListDeleteView(DeleteView):
+    model = TodoList
+
+    def get_success_url(self):
+        return reverse_lazy("todolist_list", kwargs = {
+            "dashboard_pk": self.kwargs["dashboard_pk"],
+            })
+    
+    def get_queryset(self):
+        return TodoList.objects.filter(dashboard__created_by=self.request.user)
+
+#Видалення завдання
+class TaskDeleteView(DeleteView):
+    model = Task
+
+    def get_success_url(self):
+        return reverse_lazy("task_list", kwargs = {
+            "dashboard_pk": self.kwargs["dashboard_pk"],
+            "todolist_pk": self.kwargs["todolist_pk"]
+            })
+    
+    def get_queryset(self):
+        return Task.objects.filter(todolist__dashboard__created_by=self.request.user)

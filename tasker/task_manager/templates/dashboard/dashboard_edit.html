@@ -1,17 +1,17 @@
 {% extends "base.html" %} 
 
-{% block title %} Створення дошки {% endblock title %}
+{% block title %} Редагування дошки {% endblock title %}
 
 {% block content %}
 <div class="container mt-4">
   <a href="{% url 'dashboard_list' %}" class="btn btn-secondary mb-3">Назад</a>
     <div class="card">
       <div class="card-body">
-        <h5>Створити Дошку: {{ dashboard.title }} </h5>
+        <h5>Редагувати Дошку: {{ dashboard.title }} </h5>
         <form method="post">
           {% csrf_token %}
           {{ form.as_p }}
-          <button type="submit" class="btn btn-primary" id="submit-btn">Створити</button>
+          <button type="submit" class="btn btn-primary" id="submit-btn" value="Update">Підтвердити</button>
         </form>
 </div>
 {% endblock %}

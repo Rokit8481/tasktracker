@@ -1,0 +1,17 @@
+{% extends "base.html" %} 
+
+{% block title %} Редагування списка завдань {% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+  <a href="{% url 'task_list' dashboard_pk=dashboard.pk %}" class="btn btn-secondary mb-3">Назад</a>
+    <div class="card">
+      <div class="card-body">
+        <h5>Редагувати список завдань: {{ todolist.title }} </h5>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary" id="submit-btn" value="Update">Підтвердити</button>
+        </form>
+</div>
+{% endblock %}
