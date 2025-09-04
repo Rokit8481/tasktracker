@@ -3,7 +3,6 @@
 {% block title %} Створення дошки {% endblock title %}
 
 {% block content %}
-<div class="container mt-4">
   <a href="{% url 'dashboard_list' %}" class="btn btn-secondary mb-3">Назад</a>
     <div class="card">
       <div class="card-body">
@@ -13,5 +12,4 @@
           {{ form.as_p }}
           <button type="submit" class="btn btn-primary" id="submit-btn">Створити</button>
         </form>
-</div>
 {% endblock %}

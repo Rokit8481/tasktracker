@@ -3,7 +3,6 @@
 {% block title %} Редагування дошки {% endblock title %}
 
 {% block content %}
-<div class="container mt-4">
   <a href="{% url 'dashboard_list' %}" class="btn btn-secondary mb-3">Назад</a>
     <div class="card">
       <div class="card-body">
@@ -11,7 +10,6 @@
         <form method="post">
           {% csrf_token %}
           {{ form.as_p }}
-          <button type="submit" class="btn btn-primary" id="submit-btn" value="Update">Підтвердити</button>
+          <a type="submit" class="btn btn-primary" id="submit-btn" href="{% url 'dashboard_detail' dashboard_pk=dashboard.pk %}">Підтвердити</a>
         </form>
-</div>
 {% endblock %}

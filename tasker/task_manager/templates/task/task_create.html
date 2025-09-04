@@ -3,7 +3,7 @@
 {% block title %} Створення завдання {% endblock title %}
 
 {% block content %}
-<div class="container mt-4">
+ 
   <a href="{% url 'task_list' dashboard_pk=dashboard.pk todolist_pk=todolist.pk  %}" class="btn btn-secondary mb-3">Назад</a>
     <div class="card">
       <div class="card-body">
@@ -11,9 +11,8 @@
         <form method="post">
           {% csrf_token %}
           {{ form.as_p }}
-          <button type="submit" class="btn btn-primary" id="submit-btn">Створити</button>
+          <a type="submit" class="btn btn-primary" id="submit-btn" href="{% url 'task_list' dashboard_pk=dashboard.pk todolist_pk=todolist.pk  %}">Створити</a>
         </form>
       </div>
     </div>
-</div>
 {% endblock %}

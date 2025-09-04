@@ -3,7 +3,6 @@
 {% block title %} Мої Дошки {% endblock title %}
 
 {% block content %}
-<div class="container mt-4">
     <div class="row row-cols-2 justify-content-md-center">
         {% for dashboard in dashboards %}
         <div class = "col mb-4">
@@ -11,8 +10,8 @@
                 <div class="card-body text-left">
                     <h6>Створено: {{ dashboard.created_at }}</h6>
                     <h6>{{ dashboard.created_by }}</h6>
-                    <h2>{{ dashboard.title }}</h2>
-                    <p class="card-text">{{ dashboard.description }}</p>
+                    <h2><a class="card-title" href="{% url 'dashboard_detail' dashboard_pk=dashboard.pk %}" style="text-decoration: none;">{{ dashboard.title }}</a></h2>
+                    <p class="card-text">{{ dashboard.description|truncatechars:50 }}</p>
                 </div>
             </div> 
         </div>
@@ -21,9 +20,4 @@
         {% endfor %}  
     </div>
     <a href="{% url 'dashboard_create' %}" class="btn btn-primary">Створити дошку</a>
-    <a href="{% url 'dashboard_create' %}" class="btn btn-primary">Створити список завдань</a>
-    <a href="{% url 'dashboard_create' %}" class="btn btn-primary">Створити завдання</a>
-    <a href="{% url 'dashboard_create' %}" class="btn btn-primary">Список завдань</a>
-    <a href="{% url 'dashboard_create' %}" class="btn btn-primary">Список Дошок</a>
-</div>
 {% endblock %}

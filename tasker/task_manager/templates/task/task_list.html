@@ -1,140 +1,26 @@
 {% extends "base.html" %} 
 
-{% block title %}Всі завдання списку {{ task.todolist }}{% endblock %}
+{% block title %} Всі завдання списку {{ task.todolist }} {% endblock title %}
 
 {% block content %}
-<!-- Основна обгортка без паддінгів -->
-<div class="d-flex" style="height: 100vh; margin: 0;">
+<div class="row row-cols-2 justify-content-md-center">
+    {% for task in tasks %}
+    <div class = "col mb-4">
+        <div class = "card h-100">
+            <div class="card-body text-left">
+                <h6>Створено{{ task.created_at|date:"d.m.Y H:i" }}</h6>
+                <h6>Оновлено{{ task.updated_at|date:"d.m.Y H:i" }}</h6>
+                <h2><a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">Назва:{{ task.title }}</a></h2>
+                <p class="card-text">Контент:{{ task.content|truncatechars:50 }}</p>
+                <p class="card-text">Статус: {{ task.get_status_display }}</p>
+                <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
+                <p class="card-text">Дедлайн: {{ task.deadline|date:"d.m.Y" }}</p>
+            </div>
+        </div> 
+    </div> 
+    {% empty %}
+    <p>Наразі немає жодних завдань</p>
+    {% endfor %} 
+</div> 
 
-  <!-- Лівий сайдбар -->
-  <div class="bg-light border-end d-flex flex-column" style="width: 220px;">
-    <h6 class="p-3 border-bottom m-0">Дошки</h6>
-    <ul class="list-unstyled flex-grow-1 mb-0">
-      <li class="p-2 border-bottom">
-      <div class="card mb-2">
-        <div class="card-body p-2">
-          {% for dashboard in dashboards %}
-            <h6>Створено: {{ dashboard.created_at }}</h6>
-            <h6>{{ dashboard.created_by }}</h6>
-            <h2>Назва:{{ dashboard.title }}</h2>
-            <p class="card-text">Опис:{{ dashboard.description|truncatewords:10 }}</p>
-          {% empty %}
-          <div class="alert alert-info">Немає дошок.</div>
-          {% endfor %}
-        </div>
-      </div>
-    </li>
-    <li class="p-2 border-bottom"><a href="{% url 'dashboard_create' %}" class="btn btn-primary">Створити дошку</a></li>  
-    </ul>
-    
-  </div>
-
-  <!-- Основна частина -->
-  <div class="flex-grow-1 d-flex flex-column">
-
-    <!-- Верхня панель зі списками -->
-    <div class="d-flex border-bottom p-2 m-0">
-      <div class="p-2 border me-2">Todo List ⭐</div>
-      <div class="p-2 border me-2">Work</div>
-      <div class="p-2 border me-2">Study</div>
-      <div class="p-2 border me-2">Other</div>
-      <button class="btn btn-success ms-2">+</button>
-    </div>
-
-    <!-- Kanban-дошка -->
-    <div class="d-flex flex-grow-1 overflow-auto m-0">
-
-      <!-- Чекати -->
-      <div class="flex-fill border p-2 m-0">
-        <h6 class="border-bottom pb-1 mb-2">Чернетка</h6>
-            {% for task in tasks %}
-              {% if task.status == "draft" %}
-              <div class="card mb-2">
-                <div class="card-body p-2">
-                  <h6>Створено: {{ task.created_at }}</h6>
-                  <h6>Оновлено: {{ task.updated_at }}</h6>
-                  <h6>{{ task.created_by }}</h6>
-                  <h2><a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">Назва:{{ task.title }}</a></h2>
-                  <p class="card-text">Контент:{{ task.content }}</p>
-                  <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
-                  <p class="card-text">Дедлайн: {{ task.deadline }}</p>
-                </div>
-              </div>
-              {% endif %}
-            {% empty %}
-            <div class="alert alert-info">Немає завдань з таким статусом.</div>
-            {% endfor %}
-      </div>
-
-      <!-- В роботі -->
-      <div class="flex-fill border p-2 m-0">
-        <h6 class="border-bottom pb-1 mb-2">В роботі</h6>
-            {% for task in tasks %}
-              {% if task.status == "in_progress" %}
-              <div class="card mb-2">
-                <div class="card-body p-2">
-                  <h6>Створено: {{ task.created_at }}</h6>
-                  <h6>Оновлено: {{ task.updated_at }}</h6>
-                  <h6>{{ task.created_by }}</h6>
-                  <h2><a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">Назва:{{ task.title }}</a></h2>
-                  <p class="card-text">Контент:{{ task.content }}</p>
-                  <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
-                  <p class="card-text">Дедлайн: {{ task.deadline }}</p>
-                </div>
-              </div>
-              {% endif %}
-            {% empty %}
-            <div class="alert alert-info">Немає завдань з таким статусом.</div>
-            {% endfor %}
-      </div>
-
-      <!-- Завершено -->
-      <div class="flex-fill border p-2 m-0">
-        <h6 class="border-bottom pb-1 mb-2">Завершено</h6>
-            {% for task in tasks %}
-              {% if task.status == "completed" %}
-              <div class="card mb-2">
-                <div class="card-body p-2">
-                  <h6>Створено: {{ task.created_at }}</h6>
-                  <h6>Оновлено: {{ task.updated_at }}</h6>
-                  <h6>{{ task.created_by }}</h6>
-                  <h2><a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">Назва:{{ task.title }}</a></h2>
-                  <p class="card-text">Контент:{{ task.content }}</p>
-                  <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
-                  <p class="card-text">Дедлайн: {{ task.deadline }}</p>
-                </div>
-              </div>
-              {% endif %}
-            {% empty %}
-            <div class="alert alert-info">Немає завдань з таким статусом.</div>
-            {% endfor %}
-      </div>
-
-      <!-- Архів -->
-      <div class="flex-fill border p-2 m-0">
-        <h6 class="border-bottom pb-1 mb-2">Архів</h6>
-            {% for task in tasks %}
-              {% if task.status == "archived" %}
-              <div class="card mb-2">
-                <div class="card-body p-2">
-                  <h6>Створено: {{ task.created_at }}</h6>
-                  <h6>Оновлено: {{ task.updated_at }}</h6>
-                  <h6>{{ task.created_by }}</h6>
-                  <h2><a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">Назва:{{ task.title }}</a></h2>
-                  <p class="card-text">Контент:{{ task.content }}</p>
-                  <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
-                  <p class="card-text">Дедлайн: {{ task.deadline }}</p>
-                </div>
-              </div>
-              {% endif %}
-            {% empty %}
-            <div class="alert alert-info">Немає завдань з таким статусом.</div>
-            {% endfor %}
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
 {% endblock %}

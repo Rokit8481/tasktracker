@@ -3,7 +3,7 @@
 {% block title %} {{ task.title }} {% endblock title %}
 
 {% block content %}
-<div class="container mt-4">
+ 
     <div class="row row-cols-2 justify-content-md-center">
         <div class = "col mb-4">
             <div class = "card h-100">
@@ -18,8 +18,10 @@
                     <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
                     <p class="card-text">Дедлайн: {{ task.deadline }}</p>
                 </div>
+                <div class='container mt-4 mb-4'>
+                    <a type="submit" class="btn btn-primary" id="submit-btn" href="{% url 'task_edit' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}">Редагувати</a>
+                </div>
             </div> 
         </div>
     </div>
-</div>
 {% endblock %}
