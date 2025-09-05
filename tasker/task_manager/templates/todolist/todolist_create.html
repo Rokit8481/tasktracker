@@ -10,6 +10,6 @@
       <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <a type="submit" class="btn btn-primary" id="submit-btn" href="{% url "todolist_detail" dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}">Створити</a>
+        <button type="submit" class="btn btn-primary" id="submit-btn" href="{% url "dashboard_detail" dashboard_pk=dashboard.pk %}">Створити</button>
       </form>
 {% endblock %}

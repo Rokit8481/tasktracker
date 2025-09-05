@@ -11,7 +11,7 @@
         <form method="post">
           {% csrf_token %}
           {{ form.as_p }}
-          <a type="submit" class="btn btn-primary" id="submit-btn" href="{% url 'task_list' dashboard_pk=dashboard.pk todolist_pk=todolist.pk  %}">Створити</a>
+          <button type="submit" class="btn btn-primary" id="submit-btn" href="{% url 'task_list' dashboard_pk=dashboard.pk todolist_pk=todolist.pk  %}">Створити</button>
         </form>
       </div>
     </div>
