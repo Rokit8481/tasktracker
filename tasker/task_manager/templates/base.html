@@ -11,8 +11,8 @@
     <a class="navbar-brand" href="{% url 'dashboard_list' %}">Мої Дошки</a>
     <div class="ms-auto">
       {% if user.is_authenticated %}
-        {% if dashboard and todolist %}
-        <a class="navbar-brand" href="{% url 'task_list' dashboard.pk todolist.pk %}">Мої списки завдань | </a> 
+        {% if dashboard %}
+        <a class="navbar-brand" href="{% url 'todolist_list' dashboard.pk %}">Мої списки завдань | </a> 
         {% else %}
         {{ request.user.username }} |
         {% endif %}

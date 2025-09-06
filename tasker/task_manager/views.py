@@ -111,6 +111,13 @@ class TodoListDetailView(DetailView, LoginRequiredMixin):
             pk=self.kwargs["todolist_pk"],
             dashboard_id=self.kwargs["dashboard_pk"]
         )
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        todolist = self.get_object()
+        context['dashboard'] = todolist.dashboard
+        return context
+    
 #Детальна сторінка завдання
 class TaskDetailView(DetailView, LoginRequiredMixin):
     model = Task
@@ -147,7 +154,6 @@ class DashboardCreateView(CreateView, LoginRequiredMixin):
         dashboard.created_by = self.request.user
         dashboard.save()
         return super().form_valid(form)
-    
 
 #Сторінка створення списку завдань
 class TodoListCreateView(CreateView, LoginRequiredMixin):

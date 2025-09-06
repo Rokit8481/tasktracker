@@ -22,5 +22,7 @@
     <p>Наразі немає жодних завдань</p>
     {% endfor %} 
 </div> 
+<a href="{% url 'task_create' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" class="btn btn-primary">Створити завдання</a>
+
 
 {% endblock %}

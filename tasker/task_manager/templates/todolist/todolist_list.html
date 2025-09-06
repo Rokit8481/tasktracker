@@ -10,7 +10,11 @@
             <div class="card-body text-left">
                 <h6>{{ todolist.created_at }}</h6>
                 <h6>{{ todolist.created_by }}</h6>
-                <h2><a class="card-title" href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" style="text-decoration: none;">{{ todolist.title }}</a></h2>
+                <h2><a class="card-title" href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" style="text-decoration: none;">{{ todolist.title }}
+                {% if todolist.important %}
+                    <span class="text-warning">★</span>
+                {% endif %}
+                </a></h2>
                 <p class="card-text">{{ todolist.description|truncatechars:50 }}</p>
             </div>
         </div> 
