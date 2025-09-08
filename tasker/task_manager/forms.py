@@ -1,5 +1,5 @@
 from django import forms 
-from .models import Dashboard, TodoList, Task
+from .models import Dashboard, TodoList, Task, Comment
 
 class DashboardCreateForm(forms.ModelForm):
     class Meta:
@@ -43,11 +43,11 @@ class TaskCreateForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs = {
                 "class": "form-control",
-                "placeholder": "Напишіть заголовок вашої нотатки",
+                "placeholder": "Напишіть заголовок вашого завдання",
             }),
             "content": forms.Textarea(attrs = {
                 "class": "form-control",
-                "placeholder": "Напишіть текст вашої нотатки",
+                "placeholder": "Напишіть текст вашого завдання",
                 "rows": 4,
             }),
             "status": forms.Select(attrs = {
@@ -61,3 +61,16 @@ class TaskCreateForm(forms.ModelForm):
                 "type": "date"
             }),
             }
+        
+class CommentCreateForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ("content",)
+        widgets = {
+            "content": forms.Textarea(attrs = {
+                "class": "form-control",
+                "placeholder": "Напишіть текст вашого коментаря",
+                "rows": 4,
+            }),
+            }
+

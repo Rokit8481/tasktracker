@@ -1,19 +1,22 @@
 {% extends "base.html" %} 
 
-{% block title %} Всі завдання списку {{ task.todolist }} {% endblock title %}
+{% block title %} Всі завдання списку {{ todolist.title }} {% endblock title %}
 
 {% block content %}
-<div class="row row-cols-2 justify-content-md-center">
+<div class="row row-cols-1 justify-content-md-center">
     {% for task in tasks %}
-    <div class = "col mb-4">
-        <div class = "card h-100">
+    <div class="col mb-4">
+        <div class="card h-100 shadow-sm">
             <div class="card-body text-left">
-                <h6>Створено{{ task.created_at|date:"d.m.Y H:i" }}</h6>
-                <h6>Оновлено{{ task.updated_at|date:"d.m.Y H:i" }}</h6>
-                <h2><a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">Назва:{{ task.title }}</a></h2>
-                <p class="card-text">Контент:{{ task.content|truncatechars:50 }}</p>
+                <h6>Створено: {{ task.created_at|date:"d.m.Y H:i" }} | Оновлено: {{ task.updated_at|date:"d.m.Y H:i" }}</h6>
+                <h2>
+                    <a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">
+                        {{ task.title }}
+                    </a>
+                </h2>
+                <p class="card-text">Контент: {{ task.content|truncatechars:50 }}</p>
                 <p class="card-text">Статус: {{ task.get_status_display }}</p>
-                <p class="card-text">Приорітет: {{ task.get_priority_display }}</p>
+                <p class="card-text">Пріоритет: {{ task.get_priority_display }}</p>
                 <p class="card-text">Дедлайн: {{ task.deadline|date:"d.m.Y" }}</p>
             </div>
         </div> 
@@ -23,6 +26,4 @@
     {% endfor %} 
 </div> 
 <a href="{% url 'task_create' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" class="btn btn-primary">Створити завдання</a>
-
-
 {% endblock %}

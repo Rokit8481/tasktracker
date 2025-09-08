@@ -1,15 +1,60 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Dashboard, TodoList, Task
-from .forms import DashboardCreateForm, TodoListCreateForm, TaskCreateForm
+from .models import Dashboard, TodoList, Task, Comment
+from .forms import DashboardCreateForm, TodoListCreateForm, TaskCreateForm, CommentCreateForm
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login
+from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+# Мінікс для доступу до дошки
+class DashboardAccessMixin:
+    def get_dashboard(self):
+        queryset = Dashboard.objects.filter(
+            Q(created_by=self.request.user) | Q(members=self.request.user)
+        ).distinct()
+        return get_object_or_404(queryset, pk=self.kwargs["dashboard_pk"])
 
-""""Логін, регестрація та вихід"""
+    def dispatch(self, request, *args, **kwargs):
+        self.dashboard = self.get_dashboard()
+        return super().dispatch(request, *args, **kwargs)
+
+# Мінікс для доступу до списку завдань
+class TodoListAccessMixin(DashboardAccessMixin):
+    def get_todolist(self):
+        dashboard = self.get_dashboard()
+        queryset = TodoList.objects.filter(dashboard=dashboard)
+        return get_object_or_404(queryset, pk=self.kwargs["todolist_pk"])
+
+    def dispatch(self, request, *args, **kwargs):
+        self.todolist = self.get_todolist()
+        return super().dispatch(request, *args, **kwargs)
+
+# Мінікс для доступу до завдання
+class TaskAccessMixin(TodoListAccessMixin):
+    def get_task(self):
+        todolist = self.get_todolist()
+        queryset = Task.objects.filter(todolist=todolist)
+        return get_object_or_404(queryset, pk=self.kwargs["task_pk"])
+
+    def dispatch(self, request, *args, **kwargs):
+        self.task = self.get_task()
+        return super().dispatch(request, *args, **kwargs)
+
+# Мінікс для доступу до коментаря
+class CommentAccessMixin(TaskAccessMixin):
+    def get_comment(self):
+        task = self.get_task()
+        queryset = Comment.objects.filter(task=task)
+        return get_object_or_404(queryset, pk=self.kwargs["comment_pk"])
+
+    def dispatch(self, request, *args, **kwargs):
+        self.comment = self.get_comment()
+        return super().dispatch(request, *args, **kwargs)
+
+"""Логін, регестрація та вихід"""
 
 
 # Логін
@@ -40,13 +85,13 @@ class RegisterView(CreateView):
 
 
 #Список Дошок
-class DashboardListView(ListView):
+class DashboardListView(LoginRequiredMixin, DashboardAccessMixin, ListView):
     model = Dashboard
     template_name = 'dashboard/dashboard_list.html'
     context_object_name = 'dashboards'
 
 # Список списків завдань
-class TodoListView(ListView):
+class TodoListView(LoginRequiredMixin, TodoListAccessMixin, ListView):
     model = TodoList
     template_name = 'todolist/todolist_list.html'
     context_object_name = 'todolists'
@@ -61,7 +106,7 @@ class TodoListView(ListView):
         return context
 
 #Список Завдань
-class TaskListView(ListView):
+class TaskListView(LoginRequiredMixin, TaskAccessMixin, ListView):
     model = Task
     template_name = 'task/task_list.html'
     context_object_name = 'tasks'
@@ -84,11 +129,30 @@ class TaskListView(ListView):
         }
         return context
 
+#Список Коментарів
+class CommentListView(LoginRequiredMixin, CommentAccessMixin, ListView):
+    model = Comment
+    template_name = 'comment/comment_list.html'
+    context_object_name = 'comments'
 
-""""ДЕТАЛЬНА СТОРІНКА"""
+    def get_queryset(self):
+        task_pk = self.kwargs["task_pk"]
+        return Comment.objects.filter(task_id=task_pk)
 
-#Детальна сторінка дошки
-class DashboardDetailView(DetailView, LoginRequiredMixin):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
+        context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
+        context["task"] = get_object_or_404(Task, pk=self.kwargs["task_pk"])
+        return context
+
+
+"""ДЕТАЛЬНА СТОРІНКА"""
+
+
+
+# Детальна сторінка дошки
+class DashboardDetailView(LoginRequiredMixin, DashboardAccessMixin, DetailView):
     model = Dashboard
     template_name = 'dashboard/dashboard_detail.html'
     context_object_name = 'dashboard'
@@ -96,54 +160,72 @@ class DashboardDetailView(DetailView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["todolists"] = TodoList.objects.filter(created_by=self.request.user, dashboard_id=self.kwargs["dashboard_pk"])  
+        context["todolists"] = TodoList.objects.filter(
+            Q(dashboard=self.dashboard) & 
+            (Q(created_by=self.request.user) | Q(dashboard__members=self.request.user))
+        ).distinct()
         return context
-    
-#Детальна сторінка списку завдань
-class TodoListDetailView(DetailView, LoginRequiredMixin):
+
+
+# Детальна сторінка списку завдань
+class TodoListDetailView(LoginRequiredMixin, TodoListAccessMixin, DetailView):
     model = TodoList
     template_name = 'todolist/todolist_detail.html'
     context_object_name = 'todolist'
 
     def get_object(self, queryset=None):
-        return get_object_or_404(
-            TodoList,
-            pk=self.kwargs["todolist_pk"],
-            dashboard_id=self.kwargs["dashboard_pk"]
-        )
-    
+        return self.todolist
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         todolist = self.get_object()
         context['dashboard'] = todolist.dashboard
+        context['tasks'] = Task.objects.filter(
+            Q(todolist=todolist) &
+            (Q(created_by=self.request.user) | Q(todolist__dashboard__members=self.request.user))
+        ).distinct()
         return context
-    
-#Детальна сторінка завдання
-class TaskDetailView(DetailView, LoginRequiredMixin):
+
+
+# Детальна сторінка завдання
+class TaskDetailView(LoginRequiredMixin, TaskAccessMixin, DetailView):
     model = Task
     template_name = 'task/task_detail.html'
     context_object_name = 'task'
 
     def get_object(self, queryset=None):
-        return get_object_or_404(
-            Task,
-            pk=self.kwargs["task_pk"],
-            todolist_id=self.kwargs["todolist_pk"]
-        )
-    
+        return self.task
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         task = self.get_object()
         context['todolist'] = task.todolist
         context['dashboard'] = task.todolist.dashboard
         return context
+    
+#Детальна сторінка коментаря
+class CommentDetailView(LoginRequiredMixin, CommentAccessMixin, DetailView):
+    model = Comment
+    template_name = 'comment/comment_detail.html'
+    context_object_name = 'comment'
+
+    def get_object(self, queryset=None):
+        return self.comment
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        comment = self.get_object()
+        context['task'] = comment.task
+        context['todolist'] = comment.task.todolist
+        context['dashboard'] = comment.task.todolist.dashboard
+        return context
 
 
-""""CТОРІНКА СТВОРЕННЯ"""
+"""CТОРІНКА СТВОРЕННЯ"""
 
 
 #Сторінка створення дошки
-class DashboardCreateView(CreateView, LoginRequiredMixin):
+class DashboardCreateView(LoginRequiredMixin, CreateView):
     model = Dashboard
     form_class = DashboardCreateForm
     template_name = "dashboard/dashboard_create.html"
@@ -156,7 +238,7 @@ class DashboardCreateView(CreateView, LoginRequiredMixin):
         return super().form_valid(form)
 
 #Сторінка створення списку завдань
-class TodoListCreateView(CreateView, LoginRequiredMixin):
+class TodoListCreateView(LoginRequiredMixin, CreateView):
     model = TodoList
     form_class = TodoListCreateForm
     template_name = "todolist/todolist_create.html"
@@ -177,7 +259,7 @@ class TodoListCreateView(CreateView, LoginRequiredMixin):
         return context
 
 #Сторінка створення завдання
-class TaskCreateView(CreateView, LoginRequiredMixin):
+class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
     form_class = TaskCreateForm
     template_name = "task/task_create.html"
@@ -200,13 +282,41 @@ class TaskCreateView(CreateView, LoginRequiredMixin):
         context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
         context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
         return context
+    
+#Сторінка створення коментаря
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment 
+    form_class = CommentCreateForm
+    template_name = "comment/comment_create.html"
+
+    def get_success_url(self):
+        return reverse_lazy("comment_list", kwargs = {
+            "dashboard_pk": self.kwargs["dashboard_pk"],
+            "todolist_pk": self.kwargs["todolist_pk"],
+            "task_pk": self.kwargs["task_pk"]
+            })
+
+    def form_valid(self, form):
+        comment = form.save(commit = False)
+        comment.created_by = self.request.user
+        comment.task = Task.objects.get(pk = self.kwargs["task_pk"])
+        comment.save()
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
+        context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
+        context["task"] = get_object_or_404(Task, pk=self.kwargs["task_pk"])
+        return context
 
 
-""""СТОРІНКА РЕДАГУВАННЯ"""
+"""СТОРІНКА РЕДАГУВАННЯ"""
 
 
-#Редагування дошки
-class DashboardUpdateView(UpdateView, LoginRequiredMixin):
+
+# Редагування дошки
+class DashboardUpdateView(LoginRequiredMixin, DashboardAccessMixin, UpdateView):
     model = Dashboard
     form_class = DashboardCreateForm
     template_name = 'dashboard/dashboard_edit.html'
@@ -214,42 +324,43 @@ class DashboardUpdateView(UpdateView, LoginRequiredMixin):
     pk_url_kwarg = "dashboard_pk"
 
     def get_queryset(self):
-        return Dashboard.objects.filter(created_by=self.request.user)
+        return Dashboard.objects.filter(
+            Q(created_by=self.request.user) | Q(members=self.request.user)
+        ).distinct()
 
-#Редагування списка завдань
-class TodoListUpdateView(UpdateView, LoginRequiredMixin):
+# Редагування списку завдань
+class TodoListUpdateView(LoginRequiredMixin, TodoListAccessMixin, UpdateView):
     model = TodoList
     form_class = TodoListCreateForm
     template_name = 'todolist/todolist_edit.html'
     pk_url_kwarg = "todolist_pk"
-    
+
     def get_success_url(self):
-        return reverse_lazy("todolist_list", kwargs = {
-            "dashboard_pk": self.kwargs["dashboard_pk"],
-            })
-    
+        return reverse_lazy("todolist_list", kwargs={"dashboard_pk": self.kwargs["dashboard_pk"]})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
         return context
-    
-    def get_queryset(self):
-        return TodoList.objects.filter(dashboard__created_by=self.request.user)
 
-    
-#Редагування завдання
-class TaskUpdateView(UpdateView, LoginRequiredMixin):
+    def get_queryset(self):
+        return TodoList.objects.filter(
+            Q(dashboard__created_by=self.request.user) | Q(dashboard__members=self.request.user)
+        ).distinct()
+
+# Редагування завдання
+class TaskUpdateView(LoginRequiredMixin, TaskAccessMixin, UpdateView):
     model = Task
     form_class = TaskCreateForm
     template_name = 'task/task_edit.html'
     pk_url_kwarg = "task_pk"
-    
+
     def get_success_url(self):
-        return reverse_lazy("task_list", kwargs = {
+        return reverse_lazy("task_list", kwargs={
             "dashboard_pk": self.kwargs["dashboard_pk"],
             "todolist_pk": self.kwargs["todolist_pk"]
-            })
-     
+        })
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
@@ -257,14 +368,44 @@ class TaskUpdateView(UpdateView, LoginRequiredMixin):
         return context
 
     def get_queryset(self):
-        return Task.objects.filter(todolist__dashboard__created_by=self.request.user)
-    
+        return Task.objects.filter(
+            Q(todolist__dashboard__created_by=self.request.user) |
+            Q(todolist__dashboard__members=self.request.user)
+        ).distinct()
 
-""""СТОРІНКА ВИДАЛЕННЯ"""
+# Редагування коментаря
+class CommentUpdateView(LoginRequiredMixin, CommentAccessMixin, UpdateView):
+    model = Comment
+    form_class = CommentCreateForm
+    template_name = 'comment/comment_edit.html'
+    pk_url_kwarg = "comment_pk"
+
+    def get_success_url(self):
+        return reverse_lazy("comment_list", kwargs={
+            "dashboard_pk": self.kwargs["dashboard_pk"],
+            "todolist_pk": self.kwargs["todolist_pk"],
+            "task_pk": self.kwargs["task_pk"]
+        })
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
+        context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
+        context["task"] = get_object_or_404(Task, pk=self.kwargs["task_pk"])
+        return context
+
+    def get_queryset(self):
+        return Comment.objects.filter(
+            Q(task__todolist__dashboard__created_by=self.request.user) |
+            Q(task__todolist__dashboard__members=self.request.user)
+        ).distinct()
+    
+    
+"""СТОРІНКА ВИДАЛЕННЯ"""
 
 
 #Видалення дошки
-class DashboardDeleteView(DeleteView, LoginRequiredMixin):
+class DashboardDeleteView(LoginRequiredMixin, DashboardAccessMixin, DeleteView):
     model = Dashboard
     success_url = reverse_lazy("dashboard_list")
     pk_url_kwarg = "dashboard_pk"
@@ -273,7 +414,7 @@ class DashboardDeleteView(DeleteView, LoginRequiredMixin):
         return Dashboard.objects.filter(created_by=self.request.user)
 
 #Видалення списка завдань
-class TodoListDeleteView(DeleteView, LoginRequiredMixin):
+class TodoListDeleteView(LoginRequiredMixin, TodoListAccessMixin, DeleteView):
     model = TodoList
     pk_url_kwarg = "todolist_pk"
 
@@ -286,7 +427,7 @@ class TodoListDeleteView(DeleteView, LoginRequiredMixin):
         return TodoList.objects.filter(dashboard__created_by=self.request.user)
 
 #Видалення завдання
-class TaskDeleteView(DeleteView, LoginRequiredMixin):
+class TaskDeleteView(LoginRequiredMixin, TaskAccessMixin, DeleteView):
     model = Task
     pk_url_kwarg = "task_pk"
 
@@ -298,3 +439,18 @@ class TaskDeleteView(DeleteView, LoginRequiredMixin):
     
     def get_queryset(self):
         return Task.objects.filter(todolist__dashboard__created_by=self.request.user)
+    
+#Видалення завдання
+class CommentDeleteView(LoginRequiredMixin, CommentAccessMixin, DeleteView):
+    model = Comment
+    pk_url_kwarg = "comment_pk"
+
+    def get_success_url(self):
+        return reverse_lazy("comment_list", kwargs = {
+            "dashboard_pk": self.kwargs["dashboard_pk"],
+            "todolist_pk": self.kwargs["todolist_pk"],
+            "task_pk": self.kwargs["task_pk"]
+            })
+    
+    def get_queryset(self):
+        return Comment.objects.filter(task__todolist__dashboard__created_by=self.request.user)

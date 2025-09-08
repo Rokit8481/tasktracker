@@ -5,7 +5,8 @@ class Dashboard(models.Model):
     title =  models.CharField(max_length = 200, verbose_name = "Назва") 
     description =  models.TextField(verbose_name = "Опис", blank = True) 
     created_at = models.DateTimeField(auto_now_add = True)
-    created_by = models.ForeignKey(User, on_delete = models.CASCADE, related_name='dashboards', verbose_name = "Користувач")
+    created_by = models.ForeignKey(User, on_delete = models.CASCADE, related_name='dashboards', verbose_name = "Автор")
+    members = models.ManyToManyField(User, related_name="shared_dashboards", blank=True, verbose_name = "Учасники")
 
     def __str__(self):
         return self.title
@@ -20,7 +21,7 @@ class TodoList(models.Model):
     description =  models.TextField(verbose_name = "Опис", blank = True)
     created_at = models.DateTimeField(auto_now_add = True)
     important = models.BooleanField(default = False, verbose_name = "Важливість")
-    created_by = models.ForeignKey(User, on_delete = models.CASCADE, related_name= 'todolists', verbose_name = "Користувач")
+    created_by = models.ForeignKey(User, on_delete = models.CASCADE, related_name= 'todolists', verbose_name = "Автор")
 
     def __str__(self):
         return self.title
@@ -51,7 +52,7 @@ class Task(models.Model):
     deadline = models.DateField(null=True, blank=True, verbose_name = "Дедлайн")
     created_at = models.DateTimeField(auto_now_add = True, verbose_name = "Створено в")
     updated_at = models.DateTimeField(auto_now = True, verbose_name = "Оновлено в")
-    created_by = models.ForeignKey(User, on_delete = models.CASCADE, related_name= 'tasks', verbose_name = "Користувач")
+    created_by = models.ForeignKey(User, on_delete = models.CASCADE, related_name= 'tasks', verbose_name = "Автор")
     
     def __str__(self):
         return self.title
@@ -59,3 +60,16 @@ class Task(models.Model):
     class Meta:
         verbose_name = "Завдання"
         verbose_name_plural = "Завдання"
+
+class Comment(models.Model):
+    task = models.ForeignKey(Task, on_delete = models.CASCADE, related_name = 'comments', verbose_name = 'Завдання')
+    content = models.TextField(verbose_name = "Контент", blank = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name = 'comments', verbose_name = 'Автор')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.created_by} → {self.task.title}"
+    
+    class Meta:
+        verbose_name = "Коментар"
+        verbose_name_plural = "Коментарі"
