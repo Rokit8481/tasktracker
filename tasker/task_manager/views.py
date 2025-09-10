@@ -53,7 +53,7 @@ class CustomLoginView(LoginView):
 
 # Вихід
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy("login") 
+    next_page = reverse_lazy("dashboard_list") 
 
 
 # Реєстрація
@@ -144,7 +144,7 @@ class DashboardDetailView(LoginRequiredMixin, DashboardAccessMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         dashboard = self.get_object()
-        context["todolists"] = dashboard.todolist_set.all()
+        context["todolists"] = dashboard.todolists.all()
         return context
 
 
@@ -153,12 +153,13 @@ class TodoListDetailView(LoginRequiredMixin, TodoListAccessMixin, DetailView):
     model = TodoList
     template_name = 'todolist/todolist_detail.html'
     context_object_name = 'todolist'
+    pk_url_kwarg = "todolist_pk"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         todolist = self.get_object()
         context['dashboard'] = todolist.dashboard
-        context["tasks"] = todolist.task_set.all()
+        context["tasks"] = todolist.tasks.all()
         return context
 
 
@@ -167,6 +168,7 @@ class TaskDetailView(LoginRequiredMixin, TaskAccessMixin, DetailView):
     model = Task
     template_name = 'task/task_detail.html'
     context_object_name = 'task'
+    pk_url_kwarg = "task_pk"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -180,6 +182,7 @@ class CommentDetailView(LoginRequiredMixin, CommentAccessMixin, DetailView):
     model = Comment
     template_name = 'comment/comment_detail.html'
     context_object_name = 'comment'
+    pk_url_kwarg = "comment_pk"
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
