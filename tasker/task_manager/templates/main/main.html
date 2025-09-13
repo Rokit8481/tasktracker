@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Головна{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Сайдбар з дошками -->
+    <div class="col-md-3 border-end">
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <h5>Дошки</h5>
+        <a href="{% url 'dashboard_create' %}" class="btn btn-sm btn-success">+</a>
+      </div>
+      <ul class="list-group mt-2">
+        {% for d in dashboards %}
+          <li class="list-group-item {% if selected_dashboard and d.id == selected_dashboard.id %}active{% endif %}">
+            <a href="?dashboard={{ d.id }}" class="text-decoration-none {% if selected_dashboard and d.id == selected_dashboard.id %}text-white{% endif %}">
+              {{ d.title }}
+            </a>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">Немає дошок</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Контент справа -->
+    <div class="col-md-9">
+      {% if selected_dashboard %}
+        <!-- Списки -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <h4>Списки: {{ selected_dashboard.title }}</h4>
+          <a href="{% url 'todolist_create' dashboard_pk=selected_dashboard.id %}" class="btn btn-sm btn-success">+ Додати список</a>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mb-3 mt-2">
+          {% for tl in todolists %}
+            <a href="?dashboard={{ selected_dashboard.id }}&todolist={{ tl.id }}"
+               class="btn {% if selected_todolist and tl.id == selected_todolist.id %}btn-primary{% else %}btn-outline-primary{% endif %}">
+              {{ tl.title }}
+            </a>
+          {% empty %}
+            <span class="text-muted">Немає списків</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if selected_todolist %}
+        <!-- Завдання -->
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Завдання для: {{ selected_todolist.title }}</h5>
+          <a href="{% url 'task_create' dashboard_pk=selected_dashboard.id todolist_pk=selected_todolist.id %}" class="btn btn-sm btn-success">+ Додати завдання</a>
+        </div>
+
+        <div class="row mt-3">
+          {% for key, col_title in columns.items %}
+            <div class="col-md-3">
+              <div class="card shadow-sm">
+                <div class="card-header text-center fw-bold">{{ col_title }}</div>
+                <ul class="list-group list-group-flush">
+                  {% for task in tasks %}
+                    {% if task.status == key %}
+                      <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                          <span>{{ task.title }}</span>
+                          <a href="{% url 'comment_create' dashboard_pk=selected_dashboard.id todolist_pk=selected_todolist.id task_pk=task.id %}" class="btn btn-sm btn-outline-secondary">💬</a>
+                        </div>
+                        <p class="small text-muted">{{ task.content|truncatechars:50 }}</p>
+                      </li>
+                    {% endif %}
+                  {% empty %}
+                    <li class="list-group-item text-muted">Немає завдань</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% elif selected_dashboard %}
+        <p class="text-muted">Оберіть список, щоб побачити завдання.</p>
+      {% else %}
+        <p class="text-muted">Оберіть дошку, щоб почати.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

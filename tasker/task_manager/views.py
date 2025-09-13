@@ -393,3 +393,63 @@ class CommentDeleteView(LoginRequiredMixin, CommentAccessMixin, DeleteView):
             "todolist_pk": self.kwargs["todolist_pk"],
             "task_pk": self.kwargs["task_pk"]
             })
+    
+
+"""ОСНОВНІ СТОРІНКИ САЙТУ"""
+
+#Основна сторінка де виводиться все!
+class MainPageView(TaskAccessMixin ,LoginRequiredMixin, ListView):
+    model = Task
+    template_name = "main/main.html"
+    context_object_name = "tasks"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        dashboard_pk = self.request.GET.get("dashboard")
+        todolist_pk = self.request.GET.get("todolist")
+
+        if dashboard_pk:
+            qs = qs.filter(todolist__dashboard_id=dashboard_pk)
+        if todolist_pk:
+            qs = qs.filter(todolist_id=todolist_pk)
+
+        return qs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        dashboards_qs = Dashboard.objects.filter(
+            Q(created_by=self.request.user) | Q(members=self.request.user)
+        ).distinct()
+        context["dashboards"] = dashboards_qs
+
+        dashboard_pk = self.request.GET.get("dashboard")
+        todolist_pk = self.request.GET.get("todolist")
+
+        if dashboard_pk:
+            dashboard = get_object_or_404(dashboards_qs, pk=dashboard_pk)
+            context["selected_dashboard"] = dashboard
+            context["todolists"] = dashboard.todolists.all()
+        else:
+            context["selected_dashboard"] = None
+            context["todolists"] = []
+
+        if todolist_pk:
+            todolist = get_object_or_404(
+                TodoList.objects.filter(dashboard__in=dashboards_qs),
+                pk=todolist_pk
+            )
+            context["selected_todolist"] = todolist
+        else:
+            context["selected_todolist"] = None
+
+        context["columns"] = {
+            "draft": "Чернетка",
+            "in_progress": "В процесі",
+            "completed": "Завершено",
+            "archived": "Архів"
+        }
+
+        return context
+    

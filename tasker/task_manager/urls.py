@@ -2,6 +2,9 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    #Основні
+    path("main/", MainPageView.as_view(), name="main"),
+
     # Авторизація
     path("", CustomLoginView.as_view(), name="login"),
     path("accounts/logout/", CustomLogoutView.as_view(), name="logout"),
