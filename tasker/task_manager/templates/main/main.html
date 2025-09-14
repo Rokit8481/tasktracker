@@ -1,86 +1,195 @@
 {% extends "base.html" %}
-
-{% block title %}Головна{% endblock title %}
+{% block title %}Головна{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <!-- Сайдбар з дошками -->
-    <div class="col-md-3 border-end">
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <h5>Дошки</h5>
-        <a href="{% url 'dashboard_create' %}" class="btn btn-sm btn-success">+</a>
-      </div>
-      <ul class="list-group mt-2">
-        {% for d in dashboards %}
-          <li class="list-group-item {% if selected_dashboard and d.id == selected_dashboard.id %}active{% endif %}">
-            <a href="?dashboard={{ d.id }}" class="text-decoration-none {% if selected_dashboard and d.id == selected_dashboard.id %}text-white{% endif %}">
-              {{ d.title }}
-            </a>
-          </li>
-        {% empty %}
-          <li class="list-group-item text-muted">Немає дошок</li>
-        {% endfor %}
-      </ul>
+
+<div class="row gx-4">
+  <!-- SIDEBAR: перелік дошок (фільтр через query param) -->
+  <aside class="col-lg-3 sidebar">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="mb-0">Дошки</h6>
+      <a href="{% url 'dashboard_create' %}" class="btn" style="background:linear-gradient(90deg,var(--soft-accent-1),var(--soft-accent-2)); color:#fff; border:none; padding:8px 12px; border-radius:10px;">
+        <i class="bi bi-plus-lg"></i>&nbsp;Додати
+      </a>
     </div>
 
-    <!-- Контент справа -->
-    <div class="col-md-9">
-      {% if selected_dashboard %}
-        <!-- Списки -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <h4>Списки: {{ selected_dashboard.title }}</h4>
-          <a href="{% url 'todolist_create' dashboard_pk=selected_dashboard.id %}" class="btn btn-sm btn-success">+ Додати список</a>
+    <nav class="boards-list">
+      {% for d in dashboards %}
+        <div class="d-flex align-items-start justify-content-between">
+          {# фільтрація через query param, не перехід на деталі #}
+          <a class="list-item {% if selected_dashboard and d.pk == selected_dashboard.pk %}active{% endif %}" href="?dashboard={{ d.pk }}">
+            <div>
+              <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px;">{{ d.title }}</div>
+              <div class="meta">{{ d.todolists.count }} списків</div>
+            </div>
+          </a>
+
+          {# three-dots menu для "детальніше" (деталі ведуть на dashboard_detail) #}
+          <div class="ms-2">
+            <div class="dropdown">
+              <button class="action-dot" data-bs-toggle="dropdown" aria-expanded="false" title="Дії">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li><a class="dropdown-item" href="{% url 'dashboard_detail' dashboard_pk=d.pk %}"><i class="bi bi-info-circle me-2"></i> Детальніше</a></li>
+                <li><a class="dropdown-item" href="{% url 'dashboard_edit' dashboard_pk=d.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <form method="post" action="{% url 'dashboard_delete' dashboard_pk=d.pk %}" class="m-0 p-0 delete-form">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item text-danger"> <i class="bi bi-trash me-2"></i> Видалити</button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div class="d-flex flex-wrap gap-2 mb-3 mt-2">
-          {% for tl in todolists %}
-            <a href="?dashboard={{ selected_dashboard.id }}&todolist={{ tl.id }}"
-               class="btn {% if selected_todolist and tl.id == selected_todolist.id %}btn-primary{% else %}btn-outline-primary{% endif %}">
-              {{ tl.title }}
-            </a>
-          {% empty %}
-            <span class="text-muted">Немає списків</span>
-          {% endfor %}
+      {% empty %}
+        <div class="muted">Пусто — створи першу дошку</div>
+      {% endfor %}
+    </nav>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <section class="col-lg-9">
+    {% if selected_dashboard %}
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h4 class="mb-0">{{ selected_dashboard.title }}</h4>
+          <div class="muted" style="font-size:0.9rem;">{{ selected_dashboard.description|default:"Опис відсутній" }}</div>
         </div>
-      {% endif %}
+
+        <div class="d-flex gap-2">
+          <a href="{% url 'todolist_create' dashboard_pk=selected_dashboard.pk %}" class="btn btn-filter" style="background:linear-gradient(90deg,var(--soft-accent-2),var(--soft-accent-1)); color:#fff; border:none;">
+            <i class="bi bi-list-check"></i>&nbsp;Новий список
+          </a>
+
+          <a href="{% url 'dashboard_edit' dashboard_pk=selected_dashboard.pk %}" class="btn btn-outline-light" style="border-radius:10px; padding:8px 12px;">
+            <i class="bi bi-pencil"></i>&nbsp;Редагувати
+          </a>
+        </div>
+      </div>
+
+      <!-- Список todolists (фільтри) з інтегрованим меню у кнопці -->
+      <div class="lists-row mb-3">
+        {% for tl in todolists %}
+          <div class="d-flex align-items-center">
+            <div class="btn-group" role="group">
+              <a href="?dashboard={{ selected_dashboard.pk }}&todolist={{ tl.pk }}"
+                 class="btn btn-filter {% if selected_todolist and tl.pk == selected_todolist.pk %}btn-primary{% else %}btn-outline-light{% endif %}">
+                {{ tl.title|truncatechars:30 }}
+              </a>
+
+              <button type="button" class="btn btn-filter btn-toggle dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" style="padding:8px 10px;">
+                <span class="visually-hidden">Toggle</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li><a class="dropdown-item" href="{% url 'todolist_detail' dashboard_pk=selected_dashboard.pk todolist_pk=tl.pk %}"><i class="bi bi-info-circle me-2"></i> Детальніше</a></li>
+                <li><a class="dropdown-item" href="{% url 'todolist_edit' dashboard_pk=selected_dashboard.pk todolist_pk=tl.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <form method="post" action="{% url 'todolist_delete' dashboard_pk=selected_dashboard.pk todolist_pk=tl.pk %}" class="m-0 p-0 delete-form">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item text-danger"> <i class="bi bi-trash me-2"></i> Видалити</button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        {% empty %}
+          <div class="muted">Немає списків</div>
+        {% endfor %}
+      </div>
 
       {% if selected_todolist %}
-        <!-- Завдання -->
-        <div class="d-flex justify-content-between align-items-center">
-          <h5>Завдання для: {{ selected_todolist.title }}</h5>
-          <a href="{% url 'task_create' dashboard_pk=selected_dashboard.id todolist_pk=selected_todolist.id %}" class="btn btn-sm btn-success">+ Додати завдання</a>
-        </div>
-
-        <div class="row mt-3">
+        <!-- КОЛОНКИ ТА ЗАВДАННЯ -->
+        <div class="row gy-3">
           {% for key, col_title in columns.items %}
-            <div class="col-md-3">
-              <div class="card shadow-sm">
-                <div class="card-header text-center fw-bold">{{ col_title }}</div>
-                <ul class="list-group list-group-flush">
-                  {% for task in tasks %}
-                    {% if task.status == key %}
-                      <li class="list-group-item">
-                        <div class="d-flex justify-content-between">
-                          <span>{{ task.title }}</span>
-                          <a href="{% url 'comment_create' dashboard_pk=selected_dashboard.id todolist_pk=selected_todolist.id task_pk=task.id %}" class="btn btn-sm btn-outline-secondary">💬</a>
+            <div class="col-md-6 col-lg-3">
+              <div class="board-column">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="fw-bold small text-uppercase">{{ col_title }}</div>
+                </div>
+
+                {% for task in tasks %}
+                  {% if task.status == key %}
+                    <div class="task-card">
+                      <!-- header: title + three-dots dropdown -->
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="text-decoration-none flex-grow-1 me-2">
+                          {# truncatechars гарантує обмеження по символах, плюс CSS ламає довгі слова #}
+                          <div class="task-title">{{ task.title|truncatechars:90 }}</div>
+                        </a>
+
+                        <div class="dropdown">
+                          <button class="action-dot" data-bs-toggle="dropdown" aria-expanded="false" title="Дії">
+                            <i class="bi bi-three-dots-vertical"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="{% url 'task_edit' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                              <form method="post" action="{% url 'task_delete' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="m-0 p-0 delete-form">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
+                              </form>
+                            </li>
+                          </ul>
                         </div>
-                        <p class="small text-muted">{{ task.content|truncatechars:50 }}</p>
-                      </li>
-                    {% endif %}
-                  {% empty %}
-                    <li class="list-group-item text-muted">Немає завдань</li>
-                  {% endfor %}
-                </ul>
+                      </div>
+
+                      {# Опис: обмеження по символах + CSS fallback #}
+                      <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="text-decoration-none">
+                        <div class="task-desc">{{ task.content|truncatechars:220 }}</div>
+                      </a>
+
+                      <div class="desc-actions-gap"></div>
+
+                      <!-- actions: коментарі і кнопка додати коментар -->
+                      <div class="card-actions">
+                        <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="comment-badge">
+                          <i class="bi bi-chat-dots"></i>&nbsp;{{ task.comments.count }}
+                        </a>
+
+                        <div class="d-flex gap-2">
+                          <a href="{% url 'comment_create' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="btn btn-outline-light" style="border-radius:10px; padding:6px 10px;">
+                            <i class="bi bi-plus-lg"></i>&nbsp;Комент
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
               </div>
             </div>
           {% endfor %}
         </div>
-      {% elif selected_dashboard %}
-        <p class="text-muted">Оберіть список, щоб побачити завдання.</p>
+
+        <!-- JS: confirmation for deletes -->
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.delete-form').forEach(function(form){
+              form.addEventListener('submit', function(e){
+                if (!confirm('Підтвердити видалення? Цю операцію не можна відмінити.')) {
+                  e.preventDefault();
+                }
+              });
+            });
+          });
+        </script>
       {% else %}
-        <p class="text-muted">Оберіть дошку, щоб почати.</p>
+        <div class="muted">Оберіть список, щоб побачити завдання.</div>
       {% endif %}
-    </div>
-  </div>
+
+    {% else %}
+      <div class="text-center py-6">
+        <h3>Ласкаво просимо</h3>
+        <p class="muted">Оберіть або створіть дошку, щоб почати роботу.</p>
+        <a href="{% url 'dashboard_create' %}" class="btn btn-lg" style="background:linear-gradient(90deg,var(--soft-accent-1),var(--soft-accent-2)); color:#fff; border:none;">
+          <i class="bi bi-kanban-fill"></i>&nbsp;Нова дошка
+        </a>
+      </div>
+    {% endif %}
+  </section>
 </div>
 {% endblock %}

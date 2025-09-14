@@ -1,36 +1,53 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>{% block title %}{% endblock %}</title>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<body>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}Мій сайт{% endblock %}</title>
 
-  <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-    <a class="navbar-brand" href="{% url 'dashboard_list' %}">Мої Дошки</a>
-    <div class="ms-auto">
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Optional: Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Nice sans font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <link href="{% static "css/style.css" %}" rel="stylesheet">
+
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-app navbar-app navbar-app py-2 px-4 navbar-app">
+    <a class="navbar-brand" href="{% url 'dashboard_list' %}"><i class="bi bi-kanban-fill"></i>&nbsp;Мої Дошки</a>
+
+    <div class="ms-auto d-flex align-items-center">
       {% if user.is_authenticated %}
         {% if dashboard %}
-        <a class="navbar-brand" href="{% url 'todolist_list' dashboard.pk %}">Мої списки завдань | </a> 
+          <div class="nav-left-muted d-none d-md-block">Поточна дошка:</div>
+          <div class="nav-left-muted d-none d-md-block me-3 fw-semibold">{{ dashboard.title }}</div>
         {% else %}
-        {{ request.user.username }} |
+          <div class="nav-left-muted d-none d-md-block me-3">{{ request.user.username }}</div>
         {% endif %}
-        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+        <form method="post" action="{% url 'logout' %}" class="d-inline me-2">
           {% csrf_token %}
-          <button type="submit" class="btn btn-sm btn-outline-danger">Вийти</button>
+          <button type="submit" class="btn btn-outline-light nav-btn"><i class="bi bi-box-arrow-right"></i>&nbsp;Вийти</button>
         </form>
       {% else %}
-        <a href="{% url 'login' %}" class="btn btn-sm btn-outline-primary">Увійти</a>
-        <a href="{% url 'register' %}" class="btn btn-sm btn-outline-success">Реєстрація</a>
+        <a href="{% url 'login' %}" class="btn btn-outline-light nav-btn me-2"><i class="bi bi-door-open"></i>&nbsp;Увійти</a>
+        <a href="{% url 'register' %}" class="btn btn-primary nav-btn" style="background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); border:none;"><i class="bi bi-person-plus"></i>&nbsp;Реєстрація</a>
       {% endif %}
     </div>
   </nav>
 
-  <div class="container mt-4">
+  <!-- APP SHELL -->
+  <main class="app-shell">
     {% block content %}{% endblock %}
-  </div>
+  </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>
-
