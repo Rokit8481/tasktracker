@@ -48,19 +48,19 @@ class CommentAccessMixin(TaskAccessMixin):
 class CustomLoginView(LoginView):
     template_name = "registration/login.html"
     redirect_authenticated_user = True  
-    next_page = reverse_lazy("dashboard_list") 
+    next_page = reverse_lazy("main") 
 
 
 # Вихід
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy("dashboard_list") 
+    next_page = reverse_lazy("main") 
 
 
 # Реєстрація
 class RegisterView(CreateView):
     form_class = UserCreationForm
     template_name = "registration/register.html"
-    success_url = reverse_lazy("dashboard_list")
+    success_url = reverse_lazy("main")
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -86,9 +86,6 @@ class TodoListView(LoginRequiredMixin, TodoListAccessMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
-        context["dashboards"] = Dashboard.objects.filter(
-            Q(created_by=self.request.user) | Q(members=self.request.user)
-        ).distinct()
         return context
 
 #Список Завдань
@@ -101,19 +98,6 @@ class TaskListView(LoginRequiredMixin, TaskAccessMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
         context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
-        context["dashboards"] = Dashboard.objects.filter(
-            Q(created_by=self.request.user) | Q(members=self.request.user)
-        ).distinct()
-        context["todolists"] = TodoList.objects.filter(
-            Q(dashboard__created_by=self.request.user) | 
-            Q(dashboard__members=self.request.user)
-        ).distinct() 
-        context["columns"] = {
-        "draft": "Чернетка",
-        "in_progress": "В роботі",
-        "completed": "Завершено",
-        "archived": "Архів",
-        }
         return context
 
 #Список Коментарів
@@ -292,8 +276,10 @@ class DashboardUpdateView(LoginRequiredMixin, DashboardAccessMixin, UpdateView):
     model = Dashboard
     form_class = DashboardCreateForm
     template_name = 'dashboard/dashboard_edit.html'
-    success_url = reverse_lazy("dashboard_list")
     pk_url_kwarg = "dashboard_pk"
+
+    def get_success_url(self):
+        return reverse_lazy("dashboard_detail", kwargs={"dashboard_pk": self.kwargs["dashboard_pk"]})
 
 
 # Редагування списку завдань
@@ -304,7 +290,10 @@ class TodoListUpdateView(LoginRequiredMixin, TodoListAccessMixin, UpdateView):
     pk_url_kwarg = "todolist_pk"
 
     def get_success_url(self):
-        return reverse_lazy("todolist_list", kwargs={"dashboard_pk": self.kwargs["dashboard_pk"]})
+        return reverse_lazy("todolist_detail", kwargs={
+            "dashboard_pk": self.kwargs["dashboard_pk"],
+            "todolist_pk": self.kwargs["todolist_pk"]
+            })
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -319,9 +308,10 @@ class TaskUpdateView(LoginRequiredMixin, TaskAccessMixin, UpdateView):
     pk_url_kwarg = "task_pk"
 
     def get_success_url(self):
-        return reverse_lazy("task_list", kwargs={
+        return reverse_lazy("task_detail", kwargs={
             "dashboard_pk": self.kwargs["dashboard_pk"],
-            "todolist_pk": self.kwargs["todolist_pk"]
+            "todolist_pk": self.kwargs["todolist_pk"],
+            "task_pk": self.kwargs["task_pk"]
         })
 
     def get_context_data(self, **kwargs):
@@ -338,10 +328,11 @@ class CommentUpdateView(LoginRequiredMixin, CommentAccessMixin, UpdateView):
     pk_url_kwarg = "comment_pk"
 
     def get_success_url(self):
-        return reverse_lazy("comment_list", kwargs={
+        return reverse_lazy("comment_detail", kwargs={
             "dashboard_pk": self.kwargs["dashboard_pk"],
             "todolist_pk": self.kwargs["todolist_pk"],
-            "task_pk": self.kwargs["task_pk"]
+            "task_pk": self.kwargs["task_pk"],
+            "comment_pk": self.kwargs["comment_pk"],
         })
 
     def get_context_data(self, **kwargs):

@@ -1,20 +1,46 @@
-{% extends "base.html" %} 
-
-{% block title %} Реєстрація {% endblock title %}
+{% extends "base.html" %}
+{% block title %}Реєстрація{% endblock %}
 
 {% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height:80vh;">
+  <div class="auth-card p-4 rounded shadow-lg w-100" style="max-width:480px;">
+    <h3 class="mb-3 text-center fw-bold">Створити акаунт</h3>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <div class="mb-3">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="text-danger small">{{ form.username.errors }}</div>
+        {% endif %}
+      </div>
+    
+      <div class="mb-3">
+        {{ form.password1.label_tag }}
+        {{ form.password1 }}
+        {% if form.password1.errors %}
+          <div class="text-danger small">{{ form.password1.errors }}</div>
+        {% endif %}
+      </div>
+    
+      <div class="mb-3">
+        {{ form.password2.label_tag }}
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+          <div class="text-danger small">{{ form.password2.errors }}</div>
+        {% endif %}
+      </div>
+    
+      <button type="submit" class="btn btn-filter w-100">Зареєструватися</button>
+    </form>
 
-  <div class="container full-height d-flex justify-content-center align-items-center", style = "height: 100vh;">
-    <div class="w-50 border p-2 rounded shadow-sm">
-      <h2 class="mb-2 text-center">Реєстрація</h2>
-
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Зареєструватись</button>
-      </form>
-  
+    <div class="text-center mt-3 muted">
+      Вже маєш акаунт?
+      <a href="{% url 'login' %}" class="text-decoration-none fw-semibold" style="color:var(--accent-1);">
+        Увійти
+      </a>
     </div>
   </div>
-
+</div>
 {% endblock %}

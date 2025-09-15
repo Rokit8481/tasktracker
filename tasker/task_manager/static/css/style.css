@@ -243,3 +243,154 @@ html, body {
   .task-card { min-height: 150px; padding: 12px; }
   .lists-row .btn-filter { padding: 7px 10px; font-size: 0.9rem; }
 }
+
+/* ===== AUTH PAGES ===== */
+.auth-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 28px rgba(2,6,23,0.55);
+}
+.auth-card input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+}
+.auth-card input:focus {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--accent-2);
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(61,181,255,0.25);
+}
+.auth-card label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.auth-card input, .auth-card textarea, .auth-card select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.auth-card input:focus, .auth-card textarea:focus, .auth-card select:focus {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--accent-2);
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(61,181,255,0.25);
+}
+/* ========================= */
+/* ===== INPUTS & TEXTAREAS ===== */
+/* ========================= */
+.form-control-custom {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+  outline: none;
+  box-shadow: none;
+  backdrop-filter: blur(6px);
+}
+
+.form-control-custom:focus {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 0.25rem rgba(61,181,255,0.25);
+}
+
+textarea.form-control-custom {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ========================= */
+/* ===== CHECKBOX CUSTOM ===== */
+/* ========================= */
+.form-check-input-custom {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.form-check-input-custom:checked {
+  background-color: #3db5ff;
+  border-color: #3db5ff;
+}
+
+.form-check-input-custom:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 7px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.form-check-label {
+  color: #fff;
+  font-size: 14px;
+  line-height: 24px;
+  vertical-align: middle;
+}
+
+/* ========================= */
+/* ===== SELECT CUSTOM ===== */
+/* ========================= */
+.form-control-custom select {
+  width: 100%;
+  height: 42px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background-color: rgba(255,255,255,0.02);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+  outline: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-control-custom select:focus {
+  background-color: rgba(255,255,255,0.08);
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 0.25rem rgba(61,181,255,0.25);
+}
+
+.form-control-custom option {
+  background-color: rgba(255,255,255,0.02);
+  color: #fff;
+}
+
+.form-control-custom option:hover {
+  background-color: rgba(61,181,255,0.1);
+  color: #fff;
+}
+
+.form-control-custom:hover {
+  background: rgba(255,255,255,0.04);
+}

@@ -1,15 +1,52 @@
-{% extends "base.html" %} 
-
-{% block title %} Редагування списка завдань {% endblock title %}
+{% extends "base.html" %}
+{% block title %}Редагування списку завдань{% endblock %}
 
 {% block content %}
-  <a href="{% url 'todolist_list' dashboard_pk=dashboard.pk %}" class="btn btn-secondary mb-3">Назад</a>
-    <div class="card">
-      <div class="card-body">
-        <h5>Редагувати список завдань: {{ todolist.title }} </h5>
-        <form method="post">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <a type="submit" class="btn btn-primary" id="submit-btn" href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk  %}">Підтвердити</a>
-        </form>
+<div class="d-flex justify-content-center align-items-center" style="min-height:70vh;">
+  <div class="auth-card p-4 rounded shadow-lg w-100" style="max-width:600px;">
+
+    <h4 class="mb-3 fw-bold text-center">Редагувати список завдань: {{ todolist.title }}</h4>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="mb-3">
+        {{ form.title.label_tag }}
+        {{ form.title }}
+        {% if form.title.errors %}
+          <div class="text-danger small">{{ form.title.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        {{ form.description.label_tag }}
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="text-danger small">{{ form.description.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3 form-check">
+        {{ form.important }}
+        {{ form.important.label_tag }}
+        {% if form.important.errors %}
+          <div class="text-danger small">{{ form.important.errors }}</div>
+        {% endif %}
+      </div>
+      
+
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" 
+           class="btn btn-outline-light" style="border-radius:10px;">
+          <i class="bi bi-arrow-left"></i>&nbsp;Назад
+        </a>
+
+        <button type="submit" class="btn btn-filter">
+          <i class="bi bi-check2"></i>&nbsp;Підтвердити
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
 {% endblock %}
