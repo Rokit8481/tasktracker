@@ -21,8 +21,18 @@
 </head>
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-app navbar-app navbar-app py-2 px-4 navbar-app">
-    <a class="navbar-brand" href="{% url 'dashboard_list' %}"><i class="bi bi-kanban-fill"></i>&nbsp;Мої Дошки</a>
+  <nav class="navbar navbar-expand-lg navbar-app py-2 px-4">
+    <a class="navbar-brand fw-bold" href="{% url 'main' %}">
+      <i class="bi bi-house-door-fill"></i>&nbsp;Головна
+    </a>
+
+    <ul class="navbar-nav ms-3">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'dashboard_list' %}">
+          <i class="bi bi-kanban-fill"></i>&nbsp;Мої Дошки
+        </a>
+      </li>
+    </ul>
 
     <div class="ms-auto d-flex align-items-center">
       {% if user.is_authenticated %}
@@ -34,11 +44,18 @@
         {% endif %}
         <form method="post" action="{% url 'logout' %}" class="d-inline me-2">
           {% csrf_token %}
-          <button type="submit" class="btn btn-outline-light nav-btn"><i class="bi bi-box-arrow-right"></i>&nbsp;Вийти</button>
+          <button type="submit" class="btn btn-outline-light nav-btn">
+            <i class="bi bi-box-arrow-right"></i>&nbsp;Вийти
+          </button>
         </form>
       {% else %}
-        <a href="{% url 'login' %}" class="btn btn-outline-light nav-btn me-2"><i class="bi bi-door-open"></i>&nbsp;Увійти</a>
-        <a href="{% url 'register' %}" class="btn btn-primary nav-btn" style="background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); border:none;"><i class="bi bi-person-plus"></i>&nbsp;Реєстрація</a>
+        <a href="{% url 'login' %}" class="btn btn-outline-light nav-btn me-2">
+          <i class="bi bi-door-open"></i>&nbsp;Увійти
+        </a>
+        <a href="{% url 'register' %}" class="btn btn-primary nav-btn"
+           style="background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); border:none;">
+          <i class="bi bi-person-plus"></i>&nbsp;Реєстрація
+        </a>
       {% endif %}
     </div>
   </nav>

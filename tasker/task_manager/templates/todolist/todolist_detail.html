@@ -1,88 +1,80 @@
-{% extends "base.html" %} 
-
-{% block title %} {{ todolist.title }} {% endblock title %}
+{% extends "base.html" %}
+{% block title %}Список: {{ todolist.title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="auth-card p-4 rounded shadow-lg w-100" style="max-width:900px; margin:auto;">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h3 class="fw-bold mb-1">
+        {{ todolist.title }}
+        {% if todolist.important %}<i class="bi bi-star-fill text-warning"></i>{% endif %}
+      </h3>
+      <div class="muted small">
+        Автор: {{ todolist.created_by }} · {{ todolist.created_at|date:"d.m.Y H:i" }}
+      </div>
+    </div>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <small class="text-muted d-block mb-1">
-                <strong>Автор:</strong> {{ todolist.created_by }}
-            </small>
-            <small class="text-muted d-block mb-1">
-                <strong>Створено:</strong> {{ todolist.created_at }}
-            </small>
+    <div class="dropdown">
+      <button class="action-dot" data-bs-toggle="dropdown">
+        <i class="bi bi-three-dots-vertical"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+        <li><a class="dropdown-item" href="{% url 'todolist_edit' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <form method="post" action="{% url 'todolist_delete' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk %}" class="m-0 p-0 delete-form">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  </div>
 
-            <hr>
+  {% if todolist.description %}
+    <p>{{ todolist.description }}</p>
+  {% endif %}
 
-            <h2 class="card-title mb-3">
-                {{ todolist.title }}
-                {% if todolist.important %}
-                    <span class="text-warning">★</span>
-                {% endif %}
-            </h2>
-            {% if todolist.description %}
-                <p class="card-text">{{ todolist.description }}</p>
-            {% endif %}
+  <hr>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">Завдання</h5>
+    <a href="{% url 'task_create' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk %}" class="btn btn-filter">
+      <i class="bi bi-plus-lg"></i>&nbsp;Нове завдання
+    </a>
+  </div>
+
+  {% for task in todolist.tasks.all %}
+    <div class="task-card mb-2 d-flex justify-content-between align-items-start">
+      <div>
+        <a href="{% url 'task_detail' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" class="fw-bold text-reset text-decoration-none">
+          {{ task.title }}
+        </a>
+        <div class="muted small">
+          Автор: {{ task.created_by }} · {{ task.created_at|date:"d.m.Y H:i" }}
         </div>
+        <div class="muted small">
+          Статус: {{ task.get_status_display }} · Пріоритет: {{ task.get_priority_display }}
+          {% if task.deadline %} · Дедлайн: {{ task.deadline }}{% endif %}
+        </div>
+      </div>
 
-        <div class="card-footer d-flex justify-content-between">
-            <a href="{% url 'todolist_edit' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk %}" class="btn btn-primary btn-sm">
-                Редагувати
-            </a>
-            <form method="post" action="{% url 'todolist_delete' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-sm">Видалити</button>
+      <div class="dropdown">
+        <button class="action-dot" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+          <li><a class="dropdown-item" href="{% url 'task_edit' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <form method="post" action="{% url 'task_delete' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" class="m-0 p-0 delete-form">
+              {% csrf_token %}
+              <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
             </form>
-        </div>
+          </li>
+        </ul>
+      </div>
     </div>
-
-    <h4 class="mb-3">Завдання</h4>
-    <div class="list-group">
-        {% for task in todolist.tasks.all %}
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <a href="{% url 'task_detail' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" class="text-reset text-decoration-none fw-bold">
-                        {{ task.title }}
-                    </a>
-                    {% if task.important %}
-                        <span class="text-warning">★</span>
-                    {% endif %}
-                    <br>
-                    <small class="text-muted">
-                        {{ task.content|truncatechars:80 }}
-                        <br>
-                        Статус: {{ task.get_status_display }} | Пріоритет: {{ task.get_priority_display }}
-                        {% if task.deadline %} | Дедлайн: {{ task.deadline }}{% endif %}
-                        <br>
-                        Автор: {{ task.created_by }}
-                    </small>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <a href="{% url 'task_edit' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" 
-                       class="btn btn-sm btn-outline-primary">
-                        Редагувати
-                    </a>
-                    <form method="post" action="{% url 'task_delete' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
-                    </form>
-                </div>
-            </div>
-        {% empty %}
-            <div class="alert alert-info">У цього списку ще немає завдань</div>
-        {% endfor %}
-    </div>
-
-    <div class="d-flex justify-content-between mt-3">
-        <a href="{% url 'dashboard_detail' dashboard_pk=todolist.dashboard.pk %}" class="btn btn-outline-secondary">
-            ← Назад до дошки "{{ todolist.dashboard.title }}"
-        </a>
-        <a href="{% url 'task_create' dashboard_pk=todolist.dashboard.pk todolist_pk=todolist.pk %}" class="btn btn-success">
-            Створити завдання
-        </a>
-    </div>
+  {% empty %}
+    <div class="alert alert-info">Завдань поки немає</div>
+  {% endfor %}
 </div>
 {% endblock %}

@@ -1,37 +1,33 @@
-{% extends "base.html" %}   
-
-{% block title %} Коментар до завдання: {{ task.title }} {% endblock title %}  
+{% extends "base.html" %}
+{% block title %}Коментар до: {{ task.title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <small class="text-muted d-block mb-2">
-                <strong>Автор:</strong> {{ comment.created_by }} | 
-                <strong>Створено:</strong> {{ comment.created_at|date:"d.m.Y H:i" }}
-            </small>
-
-            <hr>
-
-            <p><strong>Контент:</strong></p>
-            <p>{{ comment.content }}</p>
-        </div>
-        <div class="card-footer d-flex justify-content-between">
-            <a href="{% url 'comment_edit' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk comment_pk=comment.pk %}" 
-               class="btn btn-sm btn-outline-primary">
-                Редагувати
-            </a>
-            <form method="post" action="{% url 'comment_delete' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk comment_pk=comment.pk %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
-            </form>
-        </div>
+<div class="auth-card p-4 rounded shadow-lg w-100" style="max-width:700px; margin:auto;">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h4 class="fw-bold mb-1">Коментар</h4>
+      <div class="muted small">
+        Автор: {{ comment.created_by }} · {{ comment.created_at|date:"d.m.Y H:i" }}
+      </div>
     </div>
-    <div class="mt-3">
-        <a href="{% url 'comment_list' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" 
-            class="btn btn-outline-secondary">
-            ← До списку коментарів
-        </a>
+
+    <div class="dropdown">
+      <button class="action-dot" data-bs-toggle="dropdown">
+        <i class="bi bi-three-dots-vertical"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+        <li><a class="dropdown-item" href="{% url 'comment_edit' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk comment_pk=comment.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <form method="post" action="{% url 'comment_delete' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk comment_pk=comment.pk %}" class="m-0 p-0 delete-form">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
+          </form>
+        </li>
+      </ul>
     </div>
+  </div>
+
+  <p>{{ comment.content }}</p>
 </div>
 {% endblock %}

@@ -1,28 +1,49 @@
-{% extends "base.html" %} 
-
-{% block title %} Списки завдань дошки {{ todolist.dashboard }} {% endblock title %}
+{% extends "base.html" %}
+{% block title %}Списки завдань{% endblock %}
 
 {% block content %}
-<div class="row row-cols-2 justify-content-md-center">
-    {% for todolist in todolists %}
-    <div class = "col mb-4">
-        <div class = "card h-100">
-            <div class="card-body text-left">
-                <h6>{{ todolist.created_at }}</h6>
-                <h6>{{ todolist.created_by }}</h6>
-                <h2><a class="card-title" href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" style="text-decoration: none;">{{ todolist.title }}
-                {% if todolist.important %}
-                    <span class="text-warning">★</span>
-                {% endif %}
-                </a></h2>
-                <p class="card-text">{{ todolist.description|truncatechars:50 }}</p>
-            </div>
-        </div> 
-    </div>
-    {% empty %}
-    <p>Наразі немає жодних списків завдань</p>
-    {% endfor %}  
-</div>
-<a href="{% url 'todolist_create' dashboard_pk=dashboard.pk %}" class="btn btn-primary">Створити список завдань</a>
+<div class="auth-card p-4 rounded shadow-lg w-100" style="max-width:1100px; margin:auto;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold mb-0">Списки дошки "{{ dashboard.title }}"</h3>
+    <a href="{% url 'todolist_create' dashboard_pk=dashboard.pk %}" class="btn btn-filter">
+      <i class="bi bi-plus-lg"></i>&nbsp;Створити список
+    </a>
+  </div>
 
+  <div class="row row-cols-1 row-cols-md-2 g-3">
+    {% for todolist in todolists %}
+      <div class="col">
+        <div class="task-card h-100 d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="fw-bold mb-1">
+              <a href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" class="text-reset text-decoration-none">
+                {{ todolist.title }}
+                {% if todolist.important %}<i class="bi bi-star-fill text-warning"></i>{% endif %}
+              </a>
+            </h5>
+            <div class="muted small">Автор: {{ todolist.created_by }} · {{ todolist.created_at|date:"d.m.Y H:i" }}</div>
+            <p class="mb-0">{{ todolist.description|truncatechars:80 }}</p>
+          </div>
+
+          <div class="dropdown ms-2">
+            <button class="action-dot" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li><a class="dropdown-item" href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}"><i class="bi bi-info-circle me-2"></i> Детальніше</a></li>
+              <li><a class="dropdown-item" href="{% url 'todolist_edit' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="post" action="{% url 'todolist_delete' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" class="m-0 p-0 delete-form">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="alert alert-info">Наразі немає жодних списків</div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

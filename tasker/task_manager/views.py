@@ -83,34 +83,71 @@ class TodoListView(LoginRequiredMixin, TodoListAccessMixin, ListView):
     template_name = 'todolist/todolist_list.html'
     context_object_name = 'todolists'
 
+    def get_queryset(self):
+        qs = super().get_queryset() 
+        dashboard_pk = self.kwargs.get("dashboard_pk")
+        if dashboard_pk:
+            qs = qs.filter(dashboard_id=dashboard_pk)
+        return qs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
+        context["dashboard"] = get_object_or_404(DashboardAccessMixin.get_queryset(self), pk=self.kwargs["dashboard_pk"])
         return context
 
-#Список Завдань
+# Список завдань конкретного списку
 class TaskListView(LoginRequiredMixin, TaskAccessMixin, ListView):
     model = Task
     template_name = 'task/task_list.html'
     context_object_name = 'tasks'
     
+    def get_queryset(self):
+        qs = super().get_queryset()
+        dashboard_pk = self.kwargs.get("dashboard_pk")
+        todolist_pk = self.kwargs.get("todolist_pk")
+
+        if dashboard_pk:
+            qs = qs.filter(todolist__dashboard_id=dashboard_pk)
+        if todolist_pk:
+            qs = qs.filter(todolist_id=todolist_pk)
+
+        return qs
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
-        context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
+        dashboards_qs = DashboardAccessMixin.get_queryset(self)
+        context["dashboard"] = get_object_or_404(dashboards_qs, pk=self.kwargs["dashboard_pk"])
+        context["todolist"] = get_object_or_404(TodoListAccessMixin.get_queryset(self), pk=self.kwargs["todolist_pk"])
         return context
 
-#Список Коментарів
+
+# Список коментарів конкретного завдання
 class CommentListView(LoginRequiredMixin, CommentAccessMixin, ListView):
     model = Comment
     template_name = 'comment/comment_list.html'
     context_object_name = 'comments'
 
+    def get_queryset(self):
+        qs = super().get_queryset() 
+        dashboard_pk = self.kwargs.get("dashboard_pk")
+        todolist_pk = self.kwargs.get("todolist_pk")
+        task_pk = self.kwargs.get("task_pk")
+
+        if dashboard_pk:
+            qs = qs.filter(task__todolist__dashboard_id=dashboard_pk)
+        if todolist_pk:
+            qs = qs.filter(task__todolist_id=todolist_pk)
+        if task_pk:
+            qs = qs.filter(task_id=task_pk)
+
+        return qs
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["dashboard"] = get_object_or_404(Dashboard, pk=self.kwargs["dashboard_pk"])
-        context["todolist"] = get_object_or_404(TodoList, pk=self.kwargs["todolist_pk"])
-        context["task"] = get_object_or_404(Task, pk=self.kwargs["task_pk"])
+        dashboards_qs = DashboardAccessMixin.get_queryset(self)
+        context["dashboard"] = get_object_or_404(dashboards_qs, pk=self.kwargs["dashboard_pk"])
+        context["todolist"] = get_object_or_404(TodoListAccessMixin.get_queryset(self), pk=self.kwargs["todolist_pk"])
+        context["task"] = get_object_or_404(TaskAccessMixin.get_queryset(self), pk=self.kwargs["task_pk"])
         return context
 
 

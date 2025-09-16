@@ -1,29 +1,51 @@
-{% extends "base.html" %} 
-
-{% block title %} Всі завдання списку {{ todolist.title }} {% endblock title %}
+{% extends "base.html" %}
+{% block title %}Завдання{% endblock %}
 
 {% block content %}
-<div class="row row-cols-1 justify-content-md-center">
-    {% for task in tasks %}
-    <div class="col mb-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body text-left">
-                <h6>Створено: {{ task.created_at|date:"d.m.Y H:i" }} | Оновлено: {{ task.updated_at|date:"d.m.Y H:i" }}</h6>
-                <h2>
-                    <a class="card-title" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" style="text-decoration: none;">
-                        {{ task.title }}
-                    </a>
-                </h2>
-                <p class="card-text">Контент: {{ task.content|truncatechars:50 }}</p>
-                <p class="card-text">Статус: {{ task.get_status_display }}</p>
-                <p class="card-text">Пріоритет: {{ task.get_priority_display }}</p>
-                <p class="card-text">Дедлайн: {{ task.deadline|date:"d.m.Y" }}</p>
-            </div>
-        </div> 
-    </div> 
-    {% empty %}
-    <p>Наразі немає жодних завдань</p>
-    {% endfor %} 
-</div> 
-<a href="{% url 'task_create' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" class="btn btn-primary">Створити завдання</a>
+<div class="auth-card p-4 rounded shadow-lg w-100" style="max-width:1100px; margin:auto;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold mb-0">Завдання списку "{{ todolist.title }}"</h3>
+    <a href="{% url 'task_create' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" class="btn btn-filter">
+      <i class="bi bi-plus-lg"></i>&nbsp;Створити завдання
+    </a>
+  </div>
+
+  {% for task in tasks %}
+    <div class="task-card mb-2 d-flex justify-content-between align-items-start">
+      <div>
+        <h5 class="fw-bold mb-1">
+          <a href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" class="text-reset text-decoration-none">
+            {{ task.title }}
+          </a>
+        </h5>
+        <div class="muted small">
+          Автор: {{ task.created_by }} · {{ task.created_at|date:"d.m.Y H:i" }}<br>
+          Оновлено: {{ task.updated_at|date:"d.m.Y H:i" }}
+        </div>
+        <p class="mb-0">{{ task.content|truncatechars:100 }}</p>
+        <div class="muted small">
+          Статус: {{ task.get_status_display }} · Пріоритет: {{ task.get_priority_display }}
+          {% if task.deadline %} · Дедлайн: {{ task.deadline|date:"d.m.Y" }}{% endif %}
+        </div>
+      </div>
+
+      <div class="dropdown ms-2">
+        <button class="action-dot" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+          <li><a class="dropdown-item" href="{% url 'task_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}"><i class="bi bi-info-circle me-2"></i> Детальніше</a></li>
+          <li><a class="dropdown-item" href="{% url 'task_edit' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <form method="post" action="{% url 'task_delete' dashboard_pk=dashboard.pk todolist_pk=todolist.pk task_pk=task.pk %}" class="m-0 p-0 delete-form">
+              {% csrf_token %}
+              <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  {% empty %}
+    <div class="alert alert-info">Наразі немає жодних завдань</div>
+  {% endfor %}
+</div>
 {% endblock %}
