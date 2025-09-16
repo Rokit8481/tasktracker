@@ -26,12 +26,16 @@
         {% endif %}
       </div>
 
-      <div class="mb-3 form-check">
-        {{ form.important }}
-        {{ form.important.label_tag }}
+      <div class="mb-3 d-flex align-items-center">
+        <div class="form-check">
+          {{ form.important }}
+          <label for="{{ form.important.id_for_label }}" class="form-check-label">
+            Важливість
+          </label>
         {% if form.important.errors %}
           <div class="text-danger small">{{ form.important.errors }}</div>
         {% endif %}
+        </div>
       </div>
       
 

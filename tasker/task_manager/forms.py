@@ -19,6 +19,14 @@ class DashboardCreateForm(forms.ModelForm):
         
 
 class TodoListCreateForm(forms.ModelForm):
+    important = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            "class": "form-check-input-custom",
+            "style": "width:auto; display:inline-block; margin:0;"
+        })
+    )
+
     class Meta:
         model = TodoList
         fields = ("title", "description", "important")
@@ -31,9 +39,6 @@ class TodoListCreateForm(forms.ModelForm):
                 "class": "form-control-custom",
                 "placeholder": "Опис",
                 "rows": 3
-            }),
-            "important": forms.CheckboxInput(attrs={
-                "class": "form-check-input-custom"
             }),
         }
 

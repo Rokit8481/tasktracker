@@ -1,15 +1,37 @@
-{% extends "base.html" %} 
-
-{% block title %} Створення дошки {% endblock title %}
+{% extends "base.html" %}
+{% block title %}Створення дошки{% endblock %}
 
 {% block content %}
-  <a href="{% url 'dashboard_list' %}" class="btn btn-secondary mb-3">Назад</a>
-    <div class="card">
-      <div class="card-body">
-        <h5>Створити Дошку: {{ dashboard.title }} </h5>
-        <form method="post">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="btn btn-primary" id="submit-btn">Створити</button>
-        </form>
+<div class="d-flex justify-content-center align-items-center" style="min-height:70vh;">
+  <div class="auth-card p-4 rounded shadow-lg w-100" style="max-width:600px;">
+
+    <h4 class="mb-3 fw-bold text-center">Створити дошку</h4>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="mb-3">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.errors %}
+            <div class="text-danger small">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'dashboard_list' %}" 
+           class="btn btn-outline-light" style="border-radius:10px;">
+          <i class="bi bi-arrow-left"></i>&nbsp;Назад
+        </a>
+
+        <button type="submit" class="btn btn-filter">
+          <i class="bi bi-check2"></i>&nbsp;Створити
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
 {% endblock %}

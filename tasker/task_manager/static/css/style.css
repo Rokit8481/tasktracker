@@ -314,35 +314,39 @@ textarea.form-control-custom {
 /* ========================= */
 /* ===== CHECKBOX CUSTOM ===== */
 /* ========================= */
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* відстань між чекбоксом і текстом */
+}
+
 .form-check-input-custom {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 4px;
-  background: rgba(255,255,255,0.02);
+  width: 28px;  /* зробив більшим */
+  height: 28px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px; /* більш «плитний» */
+  background: rgba(255,255,255,0.05);
   cursor: pointer;
   position: relative;
   transition: all 0.2s ease;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 8px;
+  flex-shrink: 0;  /* не стискається */
 }
 
 .form-check-input-custom:checked {
-  background-color: #3db5ff;
-  border-color: #3db5ff;
+  background-color: var(--accent-2);
+  border-color: var(--accent-2);
 }
 
 .form-check-input-custom:checked::after {
   content: '';
   position: absolute;
-  top: 3px;
-  left: 7px;
-  width: 5px;
-  height: 10px;
+  top: 5px;   /* трохи нижче */
+  left: 9px;  /* зміщення вправо */
+  width: 6px;
+  height: 12px;
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
@@ -350,10 +354,11 @@ textarea.form-control-custom {
 
 .form-check-label {
   color: #fff;
-  font-size: 14px;
-  line-height: 24px;
-  vertical-align: middle;
+  font-size: 15px;
+  line-height: 1.4;
+  cursor: pointer;
 }
+
 
 /* ========================= */
 /* ===== SELECT CUSTOM ===== */
@@ -393,4 +398,19 @@ textarea.form-control-custom {
 
 .form-control-custom:hover {
   background: rgba(255,255,255,0.04);
+}
+
+/* ========================= */
+/* ===== SELECT OPTIONS ===== */
+/* ========================= */
+.form-control-custom option {
+  background-color: #1a1a1a; /* темний фон */
+  color: #fff;              /* білий текст */
+  padding: 8px 10px;
+}
+
+.form-control-custom option:checked,
+.form-control-custom option:hover {
+  background-color: #3db5ff; /* блакитний бекграунд */
+  color: #fff;               /* білий текст */
 }
