@@ -84,16 +84,12 @@ WSGI_APPLICATION = 'tasker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY').strip('"')
-DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+SECRET_KEY='django-insecure-&fe2g(53a#fs8)9oglt@vbh=05!^@7v&5_aeqfw=c)t(v74819'
+DEBUG=False
+ALLOWED_HOSTS=["*"]
 
 DATABASES = {
-    'default': dj_database_url.config(
-        env = 'DATABASE_URL',
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
 
 # Статичні файли
