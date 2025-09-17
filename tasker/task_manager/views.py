@@ -452,28 +452,16 @@ class DashboardMembersView(LoginRequiredMixin, DashboardAccessMixin, SingleObjec
     def get_object(self, queryset=None):
         return super().get_object(queryset)
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().post(request, *args, **kwargs)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["dashboard"] = self.get_object()
+        return kwargs
 
     def form_valid(self, form):
-        user = form.cleaned_data["username"]
+        user = form.cleaned_data["username"] 
         if user != self.object.created_by:
             self.object.members.add(user)
         return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse_lazy("dashboard_members", kwargs={"dashboard_pk": self.object.pk})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["dashboard"] = self.object
-        context["members"] = self.object.members.all()
-        return context
 
 #Видалення учасника дошки
 class DashboardMemberDeleteView(LoginRequiredMixin, DashboardAccessMixin, View):
