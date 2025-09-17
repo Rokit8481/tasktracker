@@ -19,6 +19,3 @@ Thumbs.db
 
 # Django
 *.log
-db.sqlite3
-media/
-staticfiles/
