@@ -10,8 +10,6 @@ from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 
 

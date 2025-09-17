@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: task-tracker
+    env: python
+    plan: free
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate
+    startCommand: gunicorn tasker.wsgi:application
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: tasker.settings
+      - key: PYTHON_VERSION
+        value: 3.12.3
