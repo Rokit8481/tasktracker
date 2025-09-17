@@ -1,5 +1,37 @@
 from django import forms 
 from .models import Dashboard, TodoList, Task, Comment
+from django.contrib.auth.models import User
+
+
+class AddMemberForm(forms.Form):
+    username = forms.CharField(
+        label="Імʼя користувача",
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            "class": "form-control-custom",
+            "placeholder": "Введіть імʼя користувача"
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.dashboard = kwargs.pop("dashboard", None)
+        super().__init__(*args, **kwargs)
+
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise forms.ValidationError("Користувача з таким ім'ям не існує.")
+
+        if self.dashboard and user in self.dashboard.members.all():
+            raise forms.ValidationError("Цей користувач вже є учасником цієї дошки.")
+
+        return user
+
+        
+
 
 class DashboardCreateForm(forms.ModelForm):
     class Meta:

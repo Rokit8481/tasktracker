@@ -2,9 +2,7 @@
 {% block title %}Головна{% endblock %}
 
 {% block content %}
-
 <div class="row gx-4">
-  <!-- SIDEBAR: перелік дошок (фільтр через query param) -->
   <aside class="col-lg-3 sidebar">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h6 class="mb-0">Дошки</h6>
@@ -31,11 +29,12 @@
               <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                 <li><a class="dropdown-item" href="{% url 'dashboard_detail' dashboard_pk=d.pk %}"><i class="bi bi-info-circle me-2"></i> Детальніше</a></li>
                 <li><a class="dropdown-item" href="{% url 'dashboard_edit' dashboard_pk=d.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+                <li><a class="dropdown-item" href="{% url 'dashboard_members' dashboard_pk=d.pk %}"><i class="bi bi-people me-2"></i> Учасники</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                   <form method="post" action="{% url 'dashboard_delete' dashboard_pk=d.pk %}" class="m-0 p-0 delete-form">
                     {% csrf_token %}
-                    <button type="submit" class="dropdown-item text-danger"> <i class="bi bi-trash me-2"></i> Видалити</button>
+                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
                   </form>
                 </li>
               </ul>
@@ -48,7 +47,6 @@
     </nav>
   </aside>
 
-  <!-- MAIN AREA -->
   <section class="col-lg-9">
     {% if selected_dashboard %}
       <div class="d-flex align-items-center justify-content-between mb-3">
@@ -61,14 +59,12 @@
           <a href="{% url 'todolist_create' dashboard_pk=selected_dashboard.pk %}" class="btn btn-filter" style="background:linear-gradient(90deg,var(--soft-accent-2),var(--soft-accent-1)); color:#fff; border:none;">
             <i class="bi bi-list-check"></i>&nbsp;Новий список
           </a>
-
           <a href="{% url 'dashboard_edit' dashboard_pk=selected_dashboard.pk %}" class="btn btn-outline-light" style="border-radius:10px; padding:8px 12px;">
             <i class="bi bi-pencil"></i>&nbsp;Редагувати
           </a>
         </div>
       </div>
 
-      <!-- Список todolists (фільтри) з інтегрованим меню у кнопці -->
       <div class="lists-row mb-3">
         {% for tl in todolists %}
           <div class="d-flex align-items-center">
@@ -91,7 +87,7 @@
                 <li>
                   <form method="post" action="{% url 'todolist_delete' dashboard_pk=selected_dashboard.pk todolist_pk=tl.pk %}" class="m-0 p-0 delete-form">
                     {% csrf_token %}
-                    <button type="submit" class="dropdown-item text-danger"> <i class="bi bi-trash me-2"></i> Видалити</button>
+                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
                   </form>
                 </li>
               </ul>
@@ -103,16 +99,13 @@
       </div>
 
       {% if selected_todolist %}
-        <!-- КНОПКА ДОДАТИ ЗАВДАННЯ -->
         <div class="d-flex justify-content-end mb-3">
           <a href="{% url 'task_create' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk %}" 
-             class="btn" 
-             style="background:linear-gradient(90deg,var(--soft-accent-2),var(--soft-accent-1)); color:#fff; border:none; border-radius:10px; padding:8px 12px;">
+             class="btn" style="background:linear-gradient(90deg,var(--soft-accent-2),var(--soft-accent-1)); color:#fff; border:none; border-radius:10px; padding:8px 12px;">
             <i class="bi bi-plus-lg"></i>&nbsp;Додати завдання
           </a>
         </div>
 
-        <!-- КОЛОНКИ ТА ЗАВДАННЯ -->
         <div class="row gy-3">
           {% for key, col_title in columns.items %}
             <div class="col-md-6 col-lg-3">
@@ -156,7 +149,6 @@
                         <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="comment-badge">
                           <i class="bi bi-chat-dots"></i>&nbsp;{{ task.comments.count }}
                         </a>
-
                         <div class="d-flex gap-2">
                           <a href="{% url 'comment_create' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="btn btn-outline-light" style="border-radius:10px; padding:6px 10px;">
                             <i class="bi bi-plus-lg"></i>&nbsp;Комент
@@ -170,23 +162,9 @@
             </div>
           {% endfor %}
         </div>
-
-        <!-- JS: confirmation for deletes -->
-        <script>
-          document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.delete-form').forEach(function(form){
-              form.addEventListener('submit', function(e){
-                if (!confirm('Підтвердити видалення? Цю операцію не можна відмінити.')) {
-                  e.preventDefault();
-                }
-              });
-            });
-          });
-        </script>
       {% else %}
         <div class="muted">Оберіть список, щоб побачити завдання.</div>
       {% endif %}
-
     {% else %}
       <div class="text-center py-6">
         <h3>Ласкаво просимо</h3>
@@ -198,4 +176,17 @@
     {% endif %}
   </section>
 </div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.delete-form').forEach(function(form){
+      form.addEventListener('submit', function(e){
+        if (!confirm('Підтвердити видалення? Цю операцію не можна відмінити.')) {
+          e.preventDefault();
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

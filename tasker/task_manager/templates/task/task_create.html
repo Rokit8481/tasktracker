@@ -20,7 +20,7 @@
       {% endfor %}
 
       <div class="d-flex justify-content-between mt-4">
-        <a href="{% url 'task_list' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" 
+        <a href="{% url 'todolist_detail' dashboard_pk=dashboard.pk todolist_pk=todolist.pk %}" 
            class="btn btn-outline-light" style="border-radius:10px;">
           <i class="bi bi-arrow-left"></i>&nbsp;Назад
         </a>

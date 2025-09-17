@@ -4,6 +4,9 @@ from .views import *
 urlpatterns = [
     #Основні
     path("main/", MainPageView.as_view(), name="main"),
+    path("dashboard/<int:dashboard_pk>/members/", DashboardMembersView.as_view(), name="dashboard_members"),
+    path("dashboard/<int:dashboard_pk>/members/<int:user_pk>/delete/", DashboardMemberDeleteView.as_view(), name="dashboard_member_delete" ),
+
 
     # Авторизація
     path("", CustomLoginView.as_view(), name="login"),
@@ -12,8 +15,6 @@ urlpatterns = [
 
     # Спиcок
     path('dashboards/', DashboardListView.as_view(), name = 'dashboard_list'),
-    path('dashboard/<int:dashboard_pk>/todolists/', TodoListView.as_view(), name='todolist_list'),
-    path('dashboard/<int:dashboard_pk>/todolist/<int:todolist_pk>/tasks/', TaskListView.as_view(), name = 'task_list'),
     path('dashboard/<int:dashboard_pk>/todolist/<int:todolist_pk>/task/<int:task_pk>/comments/', CommentListView.as_view(), name = 'comment_list'),
  
     # Деталі

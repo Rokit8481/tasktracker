@@ -29,6 +29,9 @@
             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
               <li><a class="dropdown-item" href="{% url 'dashboard_detail' dashboard_pk=dashboard.pk %}"><i class="bi bi-info-circle me-2"></i> Детальніше</a></li>
               <li><a class="dropdown-item" href="{% url 'dashboard_edit' dashboard_pk=dashboard.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+              <li><a class="dropdown-item" href="{% url 'dashboard_members' dashboard_pk=dashboard.pk %}">
+                <i class="bi bi-people me-2"></i> Учасники
+              </a></li>
               <li><hr class="dropdown-divider"></li>
               <li>
                 <form method="post" action="{% url 'dashboard_delete' dashboard_pk=dashboard.pk %}" class="m-0 p-0 delete-form">

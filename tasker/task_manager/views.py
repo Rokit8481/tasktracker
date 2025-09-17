@@ -1,13 +1,19 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from .models import Dashboard, TodoList, Task, Comment
-from .forms import DashboardCreateForm, TodoListCreateForm, TaskCreateForm, CommentCreateForm
+from .forms import DashboardCreateForm, TodoListCreateForm, TaskCreateForm, CommentCreateForm, AddMemberForm
 from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import login
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import FormView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+
 
 
 # Міксина до дошки
@@ -76,50 +82,6 @@ class DashboardListView(LoginRequiredMixin, DashboardAccessMixin, ListView):
     model = Dashboard
     template_name = 'dashboard/dashboard_list.html'
     context_object_name = 'dashboards'
-
-# Список списків завдань
-class TodoListView(LoginRequiredMixin, TodoListAccessMixin, ListView):
-    model = TodoList
-    template_name = 'todolist/todolist_list.html'
-    context_object_name = 'todolists'
-
-    def get_queryset(self):
-        qs = super().get_queryset() 
-        dashboard_pk = self.kwargs.get("dashboard_pk")
-        if dashboard_pk:
-            qs = qs.filter(dashboard_id=dashboard_pk)
-        return qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["dashboard"] = get_object_or_404(DashboardAccessMixin.get_queryset(self), pk=self.kwargs["dashboard_pk"])
-        return context
-
-# Список завдань конкретного списку
-class TaskListView(LoginRequiredMixin, TaskAccessMixin, ListView):
-    model = Task
-    template_name = 'task/task_list.html'
-    context_object_name = 'tasks'
-    
-    def get_queryset(self):
-        qs = super().get_queryset()
-        dashboard_pk = self.kwargs.get("dashboard_pk")
-        todolist_pk = self.kwargs.get("todolist_pk")
-
-        if dashboard_pk:
-            qs = qs.filter(todolist__dashboard_id=dashboard_pk)
-        if todolist_pk:
-            qs = qs.filter(todolist_id=todolist_pk)
-
-        return qs
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        dashboards_qs = DashboardAccessMixin.get_queryset(self)
-        context["dashboard"] = get_object_or_404(dashboards_qs, pk=self.kwargs["dashboard_pk"])
-        context["todolist"] = get_object_or_404(TodoListAccessMixin.get_queryset(self), pk=self.kwargs["todolist_pk"])
-        return context
-
 
 # Список коментарів конкретного завдання
 class CommentListView(LoginRequiredMixin, CommentAccessMixin, ListView):
@@ -237,7 +199,7 @@ class TodoListCreateView(LoginRequiredMixin, CreateView):
     template_name = "todolist/todolist_create.html"
     
     def get_success_url(self):
-        return reverse_lazy("todolist_list", kwargs = {"dashboard_pk": self.kwargs["dashboard_pk"]})
+        return reverse_lazy("dashboard_detail", kwargs = {"dashboard_pk": self.kwargs["dashboard_pk"]})
 
     def form_valid(self, form):
         todolist = form.save(commit = False)
@@ -258,7 +220,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
     template_name = "task/task_create.html"
 
     def get_success_url(self):
-        return reverse_lazy("task_list", kwargs = {
+        return reverse_lazy("todolist_detail", kwargs = {
             "dashboard_pk": self.kwargs["dashboard_pk"],
             "todolist_pk": self.kwargs["todolist_pk"]
             })
@@ -395,7 +357,7 @@ class TodoListDeleteView(LoginRequiredMixin, TodoListAccessMixin, DeleteView):
     pk_url_kwarg = "todolist_pk"
 
     def get_success_url(self):
-        return reverse_lazy("todolist_list", kwargs = {
+        return reverse_lazy("dashboard_detail", kwargs = {
             "dashboard_pk": self.kwargs["dashboard_pk"],
             })
     
@@ -405,7 +367,7 @@ class TaskDeleteView(LoginRequiredMixin, TaskAccessMixin, DeleteView):
     pk_url_kwarg = "task_pk"
 
     def get_success_url(self):
-        return reverse_lazy("task_list", kwargs = {
+        return reverse_lazy("todolist_detail", kwargs = {
             "dashboard_pk": self.kwargs["dashboard_pk"],
             "todolist_pk": self.kwargs["todolist_pk"]
             })
@@ -425,7 +387,7 @@ class CommentDeleteView(LoginRequiredMixin, CommentAccessMixin, DeleteView):
 
 """ОСНОВНІ СТОРІНКИ САЙТУ"""
 
-#Основна сторінка де виводиться все!
+#Основна сторінка
 class MainPageView(TaskAccessMixin ,LoginRequiredMixin, ListView):
     model = Task
     template_name = "main/main.html"
@@ -480,4 +442,48 @@ class MainPageView(TaskAccessMixin ,LoginRequiredMixin, ListView):
         }
 
         return context
-    
+
+#Учасники дошки
+class DashboardMembersView(LoginRequiredMixin, DashboardAccessMixin, SingleObjectMixin, FormView):
+    model = Dashboard
+    template_name = "dashboard/dashboard_members.html"
+    context_object_name = "dashboard"
+    pk_url_kwarg = "dashboard_pk"
+    form_class = AddMemberForm
+
+    def get_object(self, queryset=None):
+        return super().get_object(queryset)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.cleaned_data["username"]
+        if user != self.object.created_by:
+            self.object.members.add(user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("dashboard_members", kwargs={"dashboard_pk": self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dashboard"] = self.object
+        context["members"] = self.object.members.all()
+        return context
+
+#Видалення учасника дошки
+class DashboardMemberDeleteView(LoginRequiredMixin, DashboardAccessMixin, View):
+    def post(self, request, *args, **kwargs):
+        dashboard = get_object_or_404(Dashboard, pk=kwargs["dashboard_pk"])
+        user = get_object_or_404(User, pk=kwargs["user_pk"])
+
+        if user != dashboard.created_by:
+            dashboard.members.remove(user)
+
+        return redirect("dashboard_members", dashboard_pk=dashboard.pk)
