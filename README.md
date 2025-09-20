@@ -59,8 +59,7 @@
 
 ## 🌐 Демонстрація
 - Проєкт задеплоєний на Render:
-- 👉 [https://booking-system-v4j4.onrender.com/](https://tasktracker-paaf.onrender.com/)
-
+- 👉 https://tasktracker-paaf.onrender.com/
 ## 📷 Додаткові фото проекту
 
 <img width="1842" height="916" alt="image" src="https://github.com/user-attachments/assets/b8a5e5c9-3baf-49ba-a5ce-62b37db7c114" />
