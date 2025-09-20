@@ -414,3 +414,10 @@ textarea.form-control-custom {
   background-color: #3db5ff; /* блакитний бекграунд */
   color: #fff;               /* білий текст */
 }
+
+.task-card[draggable="true"] {
+  cursor: grab;
+}
+.board-column.drag-over {
+  background: rgba(124,92,255,0.12);
+}

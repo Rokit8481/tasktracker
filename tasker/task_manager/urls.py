@@ -6,7 +6,7 @@ urlpatterns = [
     path("main/", MainPageView.as_view(), name="main"),
     path("dashboard/<int:dashboard_pk>/members/", DashboardMembersView.as_view(), name="dashboard_members"),
     path("dashboard/<int:dashboard_pk>/members/<int:user_pk>/delete/", DashboardMemberDeleteView.as_view(), name="dashboard_member_delete" ),
-
+    path("task/update-status/", TaskStatusUpdateView.as_view(), name="task_update_status"),
 
     # Авторизація
     path("", CustomLoginView.as_view(), name="login"),

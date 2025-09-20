@@ -4,8 +4,11 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .models import Dashboard, TodoList, Task, Comment
 from .forms import DashboardCreateForm, TodoListCreateForm, TaskCreateForm, CommentCreateForm, AddMemberForm
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import login
+from django.http import JsonResponse
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import SingleObjectMixin
@@ -485,3 +488,24 @@ class DashboardMemberDeleteView(LoginRequiredMixin, DashboardAccessMixin, View):
             dashboard.members.remove(user)
 
         return redirect("dashboard_members", dashboard_pk=dashboard.pk)
+
+#Зміна статусу перетягуванням
+@method_decorator(require_POST, name='dispatch')
+class TaskStatusUpdateView(LoginRequiredMixin, TaskAccessMixin, View):
+    def post(self, request, *args, **kwargs):
+        task_id = request.POST.get("task_id")
+        new_status = request.POST.get("status")
+
+        if not task_id or new_status is None:
+            return JsonResponse({"success": False, "error": "missing_params"}, status=400)
+        
+        qs = self.get_queryset() 
+        task = get_object_or_404(qs, pk=task_id)
+        
+        try:
+            task.status = new_status
+            task.save(update_fields=["status"])
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+        return JsonResponse({"success": True, "task_id": task.id, "status": task.status})
