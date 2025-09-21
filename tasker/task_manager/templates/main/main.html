@@ -119,7 +119,22 @@
                     <div class="task-card" draggable="true" data-task-id="{{ task.pk }}">
                       <div class="d-flex justify-content-between align-items-start mb-2">
                         <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="text-decoration-none flex-grow-1 me-2">
-                          <div class="task-title">{{ task.title|truncatechars:90 }}</div>
+                          <div class="task-title">{{ task.title|truncatechars:90 }}
+                            {% if task.priority %}
+                              {% if task.priority == 'low' %}
+                                <div style="color: green">⚠</div>
+                              {% endif %}
+                              {% if task.priority == 'medium' %}
+                                <div style="color: yellow">⚠</div>
+                              {% endif %}
+                              {% if task.priority == 'high' %}
+                                <div style="color: red">⚠</div>
+                              {% endif %}
+                              {% if task.priority == 'urgent' %}
+                                <div style="color: purple">⚠</div>
+                              {% endif %}
+                            {% endif %}
+                          </div>
                         </a>
 
                         <div class="dropdown">
