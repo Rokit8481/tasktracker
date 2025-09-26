@@ -445,6 +445,7 @@ class MainPageView(TaskAccessMixin ,LoginRequiredMixin, ListView):
         return context
 
 #Учасники дошки
+
 class DashboardMembersView(LoginRequiredMixin, DashboardAccessMixin, SingleObjectMixin, FormView):
     model = Dashboard
     template_name = "main/dashboard_members.html"
@@ -463,11 +464,19 @@ class DashboardMembersView(LoginRequiredMixin, DashboardAccessMixin, SingleObjec
         self.object = self.get_object()
         return super().post(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["dashboard"] = self.object 
+        return kwargs
+
     def form_valid(self, form):
-        user = form.cleaned_data["username"]
+        user = form.cleaned_data["username"]  
         if user != self.object.created_by:
             self.object.members.add(user)
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
         return reverse_lazy("dashboard_members", kwargs={"dashboard_pk": self.object.pk})

@@ -2,20 +2,26 @@
 /* ===== VARIABLES ======= */
 /* ======================= */
 :root {
-  --soft-accent-1: rgba(110,98,166,0.9);    /* muted purple */
-  --soft-accent-2: rgba(61,181,255,0.85);  /* muted blue */
+  --soft-accent-1: rgba(110,98,166,0.9);
+  --soft-accent-2: rgba(61,181,255,0.85);
   --btn-muted-bg: rgba(255,255,255,0.02);
-  --muted-text: #9aa4b2;
 
-  --bg-1: #0f1720;        /* dark navy */
-  --bg-2: #12151a;        /* deep charcoal */
+  --bg-1: #0f1720;
+  --bg-2: #12151a;
   --panel: rgba(255,255,255,0.04);
   --glass: rgba(255,255,255,0.04);
-  --accent-1: #7c5cff;    /* purple */
-  --accent-2: #3db5ff;    /* blue */
+
+  --accent-1: #7c5cff;
+  --accent-2: #3db5ff;
+
   --muted: #9aa4b2;
+  --text-light: #fff;
+
   --card-shadow: 0 8px 30px rgba(2,6,23,0.6);
   --soft-shadow: 0 6px 18px rgba(2,6,23,0.45);
+
+  --border-light: rgba(255,255,255,0.08);
+  --border-faint: rgba(255,255,255,0.03);
 }
 
 /* ======================= */
@@ -37,8 +43,8 @@ html, body {
 .navbar-app {
   background: linear-gradient(90deg, rgba(124,92,255,0.12), rgba(61,181,255,0.06));
   backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  box-shadow: 0 4px 18px rgba(2,6,23,0.45);
+  border-bottom: 1px solid var(--border-faint);
+  box-shadow: 0 4px 18px var(--soft-shadow);
 }
 .navbar-app .navbar-brand { font-weight: 700; color: #f7f9fc; }
 .navbar-app .nav-btn {
@@ -59,7 +65,7 @@ html, body {
   border-radius: 14px;
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   box-shadow: var(--card-shadow);
-  border: 1px solid rgba(255,255,255,0.03);
+  border: 1px solid var(--border-faint);
 }
 
 /* ======================= */
@@ -77,19 +83,20 @@ html, body {
   text-decoration: none;
   background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008));
 }
-.boards-list .list-item:hover {
+.boards-list .list-item:hover,
+.boards-list .active {
+  color: var(--text-light);
   transform: translateY(-3px);
   box-shadow: var(--soft-shadow);
-  background: linear-gradient(90deg, rgba(124,92,255,0.08), rgba(61,181,255,0.03));
-  color: #fff;
 }
-.boards-list .list-item .meta { color: var(--muted); font-size: 0.85rem; }
+.boards-list .list-item:hover {
+  background: linear-gradient(90deg, rgba(124,92,255,0.08), rgba(61,181,255,0.03));
+}
 .boards-list .active {
   background: linear-gradient(90deg, rgba(124,92,255,0.18), rgba(61,181,255,0.07));
-  color: #fff;
-  box-shadow: 0 10px 30px rgba(61,92,210,0.12);
   border-left: 3px solid rgba(255,255,255,0.06);
 }
+.boards-list .list-item .meta { color: var(--muted); font-size: 0.85rem; }
 .boards-title { display: flex; align-items: center; gap: 10px; }
 
 /* ======================= */
@@ -103,28 +110,21 @@ html, body {
   color: #eaf2ff;
   background: linear-gradient(90deg, var(--soft-accent-2) 0%, var(--soft-accent-1) 100%);
   opacity: 0.88;
-  border: 1px solid rgba(255,255,255,0.04);
+  border: 1px solid var(--border-faint);
   box-shadow: 0 6px 18px rgba(2,6,23,0.22);
   transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
 }
 .btn-filter.btn-outline-light {
-  background: var(--btn-muted-bg);
-  color: #eaf2ff;
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: none;
+  color: var(--text-light);
 }
-.btn-filter:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(2,6,23,0.2); opacity: 1; }
-.btn-filter .btn-toggle {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: 1px solid rgba(255,255,255,0.03);
+.btn-filter.btn-outline-light:hover {
+  color: var(--text-light); 
 }
 
-/* Lists row (top filter controls) */
+
 .lists-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .lists-row .btn-filter { margin-right: 8px; }
 .lists-row .btn { border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 0.85rem; }
-.lists-row .btn-filter:hover { transform: translateY(-2px); }
 
 /* ======================= */
 /* ===== TASK CARDS ====== */
@@ -137,44 +137,24 @@ html, body {
   padding: 14px;
   margin-bottom: 14px;
   min-height: 180px;
-  border: 1px solid rgba(255,255,255,0.03);
+  border: 1px solid var(--border-faint);
   transition: transform .12s ease, box-shadow .12s ease;
 }
-.task-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(2,6,23,0.45); }
+.task-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px var(--soft-shadow); }
 
 .task-title {
   font-weight: 700;
   font-size: 1rem;
-  color: #f6f9ff;
+  color: var(--text-light);
   margin-bottom: 8px;
-  white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
   hyphens: auto;
   line-height: 1.08;
 }
+.task-desc { color: var(--muted); font-size: 0.92rem; margin-bottom: 12px; overflow-wrap: anywhere; }
 
-.task-desc {
-  color: var(--muted);
-  font-size: 0.92rem;
-  margin-bottom: 12px;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* Multiline clamp fallback */
-.clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Space between desc and actions */
-.desc-actions-gap { margin-top: 8px; }
-
-/* Card actions */
+/* Actions */
 .card-actions {
   display: flex;
   align-items: center;
@@ -197,33 +177,86 @@ html, body {
 }
 
 /* ======================= */
-/* ===== DROPDOWNS ======= */
+/* ===== FORM ELEMENTS ==== */
 /* ======================= */
-.dropdown-menu .dropdown-item { padding: 8px 12px; }
-
-/* ======================= */
-/* ===== ACTION DOT ====== */
-/* ======================= */
-.action-dot {
-  background: transparent;
-  border: none;
-  color: #cfe8ff;
-  padding: 6px;
-  border-radius: 8px;
-}
-.action-dot:hover { background: rgba(255,255,255,0.02); }
-
-/* ======================= */
-/* ===== BOARD COLUMNS ==== */
-/* ======================= */
-.board-column {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+.auth-card,
+.form-control-custom,
+.auth-card input, .auth-card textarea, .auth-card select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-light);
+  color: var(--text-light);
   border-radius: 12px;
-  padding: 10px;
-  height: auto;
-  min-height: 80px;
-  box-shadow: 0 6px 18px rgba(2,6,23,0.35);
-  border: 1px solid rgba(255,255,255,0.02);
+  transition: all 0.2s ease;
+}
+.auth-card {
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 28px rgba(2,6,23,0.55);
+}
+.form-control-custom {
+  width: 100%; padding: 10px 12px;
+  font-size: 14px; line-height: 1.4;
+  backdrop-filter: blur(6px);
+}
+textarea.form-control-custom { min-height: 100px; resize: vertical; }
+
+.auth-card input:focus,
+.form-control-custom:focus,
+.auth-card textarea:focus,
+.auth-card select:focus {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--accent-2);
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(61,181,255,0.25);
+}
+
+.auth-card label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Checkboxes */
+.form-check { display: flex; align-items: center; gap: 10px; }
+.form-check-input-custom {
+  appearance: none;
+  width: 28px; height: 28px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.form-check-input-custom:checked {
+  background-color: var(--accent-2);
+  border-color: var(--accent-2);
+}
+.form-check-input-custom:checked::after {
+  content: ''; position: absolute;
+  top: 5px; left: 9px;
+  width: 6px; height: 12px;
+  border: solid var(--text-light);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.form-check-label { color: var(--text-light); font-size: 15px; cursor: pointer; }
+
+/* Select */
+.form-control-custom select {
+  width: 100%; height: 42px;
+  padding: 8px 10px;
+  background-color: rgba(255,255,255,0.02);
+  -moz-appearance: none; -webkit-appearance: none; appearance: none;
+}
+.form-control-custom option {
+  background-color: #1a1a1a;
+  color: var(--text-light);
+}
+.form-control-custom option:checked,
+.form-control-custom option:hover {
+  background-color: var(--accent-2);
+  color: var(--text-light);
 }
 
 /* ======================= */
@@ -231,6 +264,12 @@ html, body {
 /* ======================= */
 .muted { color: var(--muted); }
 .rounded-sm { border-radius: 8px; }
+
+/* ======================= */
+/* ===== DRAG N DROP ===== */
+/* ======================= */
+.task-card[draggable="true"] { cursor: grab; }
+.board-column.drag-over { background: rgba(124,92,255,0.12); }
 
 /* ======================= */
 /* ===== RESPONSIVE ====== */
@@ -244,180 +283,63 @@ html, body {
   .lists-row .btn-filter { padding: 7px 10px; font-size: 0.9rem; }
 }
 
-/* ===== AUTH PAGES ===== */
-.auth-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border: 1px solid rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 28px rgba(2,6,23,0.55);
+.action-dot {
+  background: transparent;
+  border: none;
+  color: var(--text-light); 
+  padding: 4px 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
-.auth-card input {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #fff;
+
+.action-dot:hover {
+  background: rgba(255,255,255,0.08); 
+  color: var(--accent-2);
 }
-.auth-card input:focus {
-  background: rgba(255,255,255,0.08);
-  border-color: var(--accent-2);
-  outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(61,181,255,0.25);
-}
-.auth-card label {
+
+/* ==== Пріоритети ==== */
+.priority-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--muted);
-  font-size: 0.9rem;
+  border-radius: 999px;
+  margin-left: 6px;
 }
+.priority-low { background: #2d6a4f; color: #fff; }
+.priority-medium { background: #ffb703; color: #000; }
+.priority-high { background: #e63946; color: #fff; }
+.priority-urgent { background: #9d0208; color: #fff; }
 
-.auth-card input, .auth-card textarea, .auth-card select {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #fff;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
+/* ==== Статуси ==== */
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
-.auth-card input:focus, .auth-card textarea:focus, .auth-card select:focus {
-  background: rgba(255,255,255,0.08);
-  border-color: var(--accent-2);
-  outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(61,181,255,0.25);
-}
-/* ========================= */
-/* ===== INPUTS & TEXTAREAS ===== */
-/* ========================= */
-.form-control-custom {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-  color: #fff;
-  font-size: 14px;
-  line-height: 1.4;
-  transition: all 0.2s ease;
-  outline: none;
-  box-shadow: none;
-  backdrop-filter: blur(6px);
-}
+.status-todo { background: #495057; color: #fff; }
+.status-progress { background: #3a86ff; color: #fff; }
+.status-review { background: #ffb703; color: #000; }
+.status-done { background: #2d6a4f; color: #fff; }
 
-.form-control-custom:focus {
-  background: rgba(255,255,255,0.08);
-  border-color: var(--accent-2);
-  box-shadow: 0 0 0 0.25rem rgba(61,181,255,0.25);
-}
-
-textarea.form-control-custom {
-  min-height: 100px;
-  resize: vertical;
-}
-
-/* ========================= */
-/* ===== CHECKBOX CUSTOM ===== */
-/* ========================= */
-.form-check {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* відстань між чекбоксом і текстом */
-}
-
-.form-check-input-custom {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  width: 28px;  /* зробив більшим */
-  height: 28px;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 6px; /* більш «плитний» */
+/* ==== Коментарі (темний стиль) ==== */
+.task-card .collapse .card {
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
   background: rgba(255,255,255,0.05);
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
-  flex-shrink: 0;  /* не стискається */
+  color: var(--text-light);
+}
+.task-card .collapse .card .small {
+  color: var(--text-light);
+}
+.task-card .collapse .card strong {
+  color: var(--accent-2);
 }
 
-.form-check-input-custom:checked {
-  background-color: var(--accent-2);
-  border-color: var(--accent-2);
-}
-
-.form-check-input-custom:checked::after {
-  content: '';
-  position: absolute;
-  top: 5px;   /* трохи нижче */
-  left: 9px;  /* зміщення вправо */
-  width: 6px;
-  height: 12px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.form-check-label {
-  color: #fff;
-  font-size: 15px;
-  line-height: 1.4;
-  cursor: pointer;
-}
-
-
-/* ========================= */
-/* ===== SELECT CUSTOM ===== */
-/* ========================= */
-.form-control-custom select {
-  width: 100%;
-  height: 42px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background-color: rgba(255,255,255,0.02);
-  color: #fff;
-  font-size: 14px;
-  line-height: 1.5;
-  transition: all 0.2s ease;
-  outline: none;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.form-control-custom select:focus {
-  background-color: rgba(255,255,255,0.08);
-  border-color: var(--accent-2);
-  box-shadow: 0 0 0 0.25rem rgba(61,181,255,0.25);
-}
-
-.form-control-custom option {
-  background-color: rgba(255,255,255,0.02);
-  color: #fff;
-}
-
-.form-control-custom option:hover {
-  background-color: rgba(61,181,255,0.1);
-  color: #fff;
-}
-
-.form-control-custom:hover {
-  background: rgba(255,255,255,0.04);
-}
-
-/* ========================= */
-/* ===== SELECT OPTIONS ===== */
-/* ========================= */
-.form-control-custom option {
-  background-color: #1a1a1a; /* темний фон */
-  color: #fff;              /* білий текст */
-  padding: 8px 10px;
-}
-
-.form-control-custom option:checked,
-.form-control-custom option:hover {
-  background-color: #3db5ff; /* блакитний бекграунд */
-  color: #fff;               /* білий текст */
-}
-
-.task-card[draggable="true"] {
-  cursor: grab;
-}
-.board-column.drag-over {
-  background: rgba(124,92,255,0.12);
+/* ==== Анімація відкривання ==== */
+.collapse {
+  transition: all 0.25s ease-in-out;
 }

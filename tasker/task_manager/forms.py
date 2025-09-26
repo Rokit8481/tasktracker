@@ -1,7 +1,7 @@
 from django import forms 
 from .models import Dashboard, TodoList, Task, Comment
 from django.contrib.auth.models import User
-
+from django.utils import timezone
 
 class AddMemberForm(forms.Form):
     username = forms.CharField(
@@ -28,9 +28,10 @@ class AddMemberForm(forms.Form):
         if self.dashboard and user in self.dashboard.members.all():
             raise forms.ValidationError("Цей користувач вже є учасником цієї дошки.")
 
-        return user
+        if self.dashboard and user == self.dashboard.created_by:
+            raise forms.ValidationError("Цей користувач є власником дошки.")
 
-        
+        return user
 
 
 class DashboardCreateForm(forms.ModelForm):
@@ -48,7 +49,19 @@ class DashboardCreateForm(forms.ModelForm):
                 "rows": 3
             }),
         }
-        
+
+    def clean_title(self):
+        title = self.cleaned_data.get("title")
+        if not title or len(title.strip()) == 0:
+            raise forms.ValidationError("Назва не може бути порожньою.")
+        return title
+
+    def clean_description(self):
+        description = self.cleaned_data.get("description")
+        if not description or len(description.strip()) == 0:
+            raise forms.ValidationError("Опис не може бути порожнім.")
+        return description
+
 
 class TodoListCreateForm(forms.ModelForm):
     important = forms.BooleanField(
@@ -73,6 +86,18 @@ class TodoListCreateForm(forms.ModelForm):
                 "rows": 3
             }),
         }
+
+    def clean_title(self):
+        title = self.cleaned_data.get("title")
+        if not title or len(title.strip()) == 0:
+            raise forms.ValidationError("Назва не може бути порожньою.")
+        return title
+
+    def clean_description(self):
+        description = self.cleaned_data.get("description")
+        if not description or len(description.strip()) == 0:
+            raise forms.ValidationError("Опис не може бути порожнім.")
+        return description
 
 
 class TaskCreateForm(forms.ModelForm):
@@ -100,7 +125,25 @@ class TaskCreateForm(forms.ModelForm):
                 "type": "date"
             }),
         }
-        
+
+    def clean_title(self):
+        title = self.cleaned_data.get("title")
+        if not title or len(title.strip()) == 0:
+            raise forms.ValidationError("Заголовок не може бути порожнім.")
+        return title
+
+    def clean_content(self):
+        content = self.cleaned_data.get("content")
+        if not content or len(content.strip()) == 0:
+            raise forms.ValidationError("Текст завдання не може бути порожнім.")
+        return content
+
+    def clean_deadline(self):
+        deadline = self.cleaned_data.get("deadline")
+        if deadline and deadline < timezone.now().date():
+            raise forms.ValidationError("Дедлайн не може бути в минулому.")
+        return deadline
+
 
 class CommentCreateForm(forms.ModelForm):
     class Meta:
@@ -113,3 +156,9 @@ class CommentCreateForm(forms.ModelForm):
                 "rows": 4,
             }),
         }
+
+    def clean_content(self):
+        content = self.cleaned_data.get("content")
+        if not content or len(content.strip()) == 0:
+            raise forms.ValidationError("Коментар не може бути порожнім.")
+        return content
