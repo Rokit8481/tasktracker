@@ -113,18 +113,19 @@
 
         <div class="row gy-3">
           {% for key, col_title in columns.items %}
-            <div class="col-md-6 col-lg-3">
-              <div class="board-column" data-status="{{ key }}">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <div class="fw-bold small text-uppercase">{{ col_title }}</div>
-                </div>
-
-                {% for task in tasks %}
+          <div class="col-md-6 col-lg-3">
+            <div class="board-column" data-status="{{ key }}" style="min-height:400px;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-bold small text-uppercase">{{ col_title }}</div>
+              </div>
+        
+              {% with col_tasks=tasks|dictsort:"pk" %}
+                {% for task in col_tasks %}
                   {% if task.status == key %}
                     <div class="task-card" draggable="true" data-task-id="{{ task.pk }}">
                       <div class="d-flex justify-content-between align-items-start mb-2">
                         <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" 
-                          class="text-decoration-none flex-grow-1 me-2">
+                           class="text-decoration-none flex-grow-1 me-2">
                           <div class="task-title">
                             {{ task.title|truncatechars:90 }}
                             {% if task.priority == "low" %}
@@ -138,50 +139,36 @@
                             {% endif %}
                           </div>
                         </a>
+        
+                        <div class="dropdown">
+                          <button class="action-dot" data-bs-toggle="dropdown" aria-expanded="false" title="Дії">
+                            <i class="bi bi-three-dots-vertical"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}"><i class="bi bi-info-circle me-2"></i> Детальніше</a></li>
+                            <li><a class="dropdown-item" href="{% url 'task_edit' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                              <form method="post" action="{% url 'task_delete' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="m-0 p-0 delete-form">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
+                              </form>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
-
                       <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="text-decoration-none">
                         <div class="task-desc">{{ task.content|truncatechars:220 }}</div>
                       </a>
-
-                      <div class="card-actions mt-2">
-                        <button type="button" class="comment-badge btn btn-sm btn-outline-light"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#comments-{{ task.pk }}"
-                                aria-expanded="false"
-                                aria-controls="comments-{{ task.pk }}">
-                          <i class="bi bi-chat-dots"></i>&nbsp;{{ task.comments.count }}
-                        </button>
-                      </div>
-
-                      <div class="collapse mt-2" id="comments-{{ task.pk }}">
-                        <div class="card card-body p-2">
-                          {% if task.comments.all %}
-                            {% for comment in task.comments.all|slice:":5" %}
-                              <div class="small mb-1">
-                                <strong>{{ comment.created_by.username }}</strong>: <a href="{% url 'comment_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk comment_pk=comment.pk %}" class="text-decoration-none task-desc">{{ comment.content|truncatechars:80 }}<a>
-                              </div>
-                            {% endfor %}
-                            {% if task.comments.count > 5 %}
-                              <div class="small text-muted">… ще {{ task.comments.count|add:"-5" }}</div>
-                            {% endif %}
-                          {% else %}
-                            <div class="small text-muted">Коментарів поки що немає</div>
-                          {% endif %}
-                          <div class="mt-2">
-                            <a href="{% url 'comment_create' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" 
-                              class="btn btn-sm btn-primary">
-                              <i class="bi bi-plus-lg"></i>&nbsp;Додати
-                            </a>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   {% endif %}
+                {% empty %}
+                  <div class="text-muted small fst-italic">Поки що завдань немає</div>
                 {% endfor %}
-              </div>
+              {% endwith %}
             </div>
-          {% endfor %}
+          </div>
+        {% endfor %}
         </div>
       {% else %}
         <div class="muted">Оберіть список, щоб побачити завдання.</div>
