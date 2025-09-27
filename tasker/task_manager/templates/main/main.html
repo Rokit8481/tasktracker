@@ -138,6 +138,22 @@
                             {% endif %}
                           </div>
                         </a>
+                        <div class="dropdown">
+                          <button class="action-dot" data-bs-toggle="dropdown" aria-expanded="false" title="Дії">
+                            <i class="bi bi-three-dots-vertical"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}"><i class="bi bi-info-circle me-2"></i> Детальніше</a></li>
+                            <li><a class="dropdown-item" href="{% url 'task_edit' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}"><i class="bi bi-pencil me-2"></i> Редагувати</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                              <form method="post" action="{% url 'task_delete' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="m-0 p-0 delete-form">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Видалити</button>
+                              </form>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
 
                       <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="text-decoration-none">
