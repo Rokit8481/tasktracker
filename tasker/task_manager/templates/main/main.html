@@ -155,7 +155,6 @@
                           </ul>
                         </div>
                       </div>
-
                       <a href="{% url 'task_detail' dashboard_pk=selected_dashboard.pk todolist_pk=selected_todolist.pk task_pk=task.pk %}" class="text-decoration-none">
                         <div class="task-desc">{{ task.content|truncatechars:220 }}</div>
                       </a>
