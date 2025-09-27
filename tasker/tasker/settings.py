@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'tasker.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 SECRET_KEY='django-insecure-&fe2g(53a#fs8)9oglt@vbh=05!^@7v&5_aeqfw=c)t(v74819'
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS=["*"]
 
 DATABASES = {
