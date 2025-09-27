@@ -68,7 +68,6 @@ class TodoListCreateForm(forms.ModelForm):
         required=False,
         widget=forms.CheckboxInput(attrs={
             "class": "form-check-input-custom",
-            "style": "width:auto; display:inline-block; margin:0;"
         })
     )
 

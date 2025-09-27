@@ -36,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll('.task-card').forEach(attachDragHandlers);
 
-  // підтвердження на видалення
   document.querySelectorAll('.delete-form').forEach(function(form){
     form.addEventListener('submit', function(e){
       if (!confirm('Підтвердити видалення? Цю операцію не можна відмінити.')) {
@@ -73,7 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const body = new URLSearchParams({ task_id: taskId, status: newStatus });
 
       try {
-        // 🔑 беремо URL, який передали через шаблон
         const updateUrl = window.taskUpdateUrl;
 
         const resp = await fetch(updateUrl, {
