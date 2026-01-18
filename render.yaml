@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: tasktracker
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn tasker.wsgi:application --bind 0.0.0.0:$PORT"
